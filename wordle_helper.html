@@ -13048,6 +13048,7 @@ var words = [
 var NWORDS = 12972;
 var NLETTER = 26;
 var NPOS = 5;
+var INDEX_LAST_CURATED_WORD = 2314;
 var hard = new Array(NWORDS); // used for caching hardmode words
 var knowledge = new Array(NPOS);
 var counts = new Array(NLETTER);
@@ -13066,8 +13067,7 @@ for(var w = 0; w < NWORDS; ++w) {
     hard[w] = true;
 }
 
-function update_count(guess, response)
-{
+function update_count(guess, response) {
     // response: 0=in-place, 1=present, 2=absent
     var local_counts = new Array(NLETTER);
     for(var i = 0; i < NLETTER; ++i) 
@@ -13126,7 +13126,7 @@ function update_conservative(response, guess) {
                 }
                 if(all_ok)
                 {
-                    // all are coorectly placed
+                    // all are correctly placed
                     for(var q = 0; q < NPOS; ++q)
                         if(guess[q] != guess[p] || response[q] != 0)
                             knowledge[q][guess[p]] = -1;
@@ -13192,6 +13192,7 @@ function update_permissive(response, guess) {
     check_sums(response);
 }
 
+// generate history of guesses and their accuracy per letter in guess
 function response_to_html(guess, response) {
     res = "";
     for(var p = 0; p < NPOS; ++p)
@@ -13256,6 +13257,7 @@ function consistent(wid) {
 }
 
 function update_all_e(e){
+	// if enter is pressed
     if(e.keyCode === 13) {
         e.preventDefault();
         update_all();
@@ -13266,16 +13268,18 @@ function update_all() {
     var guess = document.getElementById("guess").value;
     var response = document.getElementById("response").value;
 
-    if(response.length != NPOS)
-    {
+    if(response.length != NPOS) {
         alert("Need 5 characters in reponse");
         return;
     }
-    if(guess.length != NPOS)
-    {
+    if(guess.length != NPOS) {
         alert("Need 5 characters in guess");
         return;
     }
+	if (response.match(/\D/)) {
+		alert("Need only numbers");
+		return;
+	}
 
     var num_guess = new Array(NPOS);
     for(var p = 0; p < NPOS; ++p)
@@ -13405,7 +13409,9 @@ function show_words() {
                 var btn = "<button class='word' onclick='fill_answer(\"" + word + "\")'>" + vw;
                 if(best != Infinity)
                 { 
+					console.log("wid: " + wid)
                     var cst = strategy_lookup(wid);
+					console.log("cst: " + cst)
                     btn += "(" + cst.toFixed(3) + ")";
                 }
                 btn += "</button>";
@@ -13430,6 +13436,8 @@ function show_words() {
 
 function fill_answer(word) {
     document.getElementById("guess").value = word;
+	if (word )
+	play(word); // do wordle game logic
 }
 
 function display_knowledge() {
@@ -13457,6 +13465,70 @@ function display_knowledge() {
     document.getElementById("knowledge").innerHTML = knhtml;
 }
 
+
+/*
+- pick random word from wordlist 
+- prompt user to click a suggested word from sorted list
+- fill guess and response (dont visually show response)
+- show history prominently
+- solitare fireworks when finished
+
+
+additionally:
+- highlight sorted Q-value list with known info to illustrate guesses on the actual word, or guesses to win knowledge
+*/
+
+function toChar(i) {
+		return String.fromCharCode(97 + i);
+}
+
+function random_target_word() {
+	//maybe constrained by some hard-mode settings?? only pick words from curated list?
+	only_curated = true;
+
+	const index = Math.floor(Math.random() * (only_curated ? INDEX_LAST_CURATED_WORD : words.length));
+
+	// TODO: maybe remake with filter, as it's nicer
+	var target = words[index];
+	for (var i = 0; i < NPOS; i++) {
+		target[i] = String.fromCharCode(words[index][i] + 97);
+	}
+	target = target.join('');
+	console.log("target word: " + target + " at i: " + index);
+	return {cleartext: target, index: index, chars: words[index]};
+}
+
+var TARGET;
+
+
+function play(g) {
+	// calculate response for word onto TARGET_WORD
+	if (g == undefined) {
+		alert("Pick word to guess before choosing a word");
+		return;
+	}
+	const guess = g.split('');
+	const target = document.getElementById('target_word').value.split('');
+
+	const correctLetters = new Set(TARGET['cleartext']);
+	var response = new Array(-1,-1,-1,-1,-1);
+	
+	for (let i = 0; i < NPOS; i++) {
+		if (guess[i] === target[i]) {
+			response[i] = 0;
+		} else if (correctLetters.has(guess[i])) {
+			response[i] = 1; 
+		} else {
+			response[i] = 2;
+		}
+	}
+	console.log("guess: " + g + " gave response: " + response);
+
+	document.getElementById("response").value = response.join('');
+	update_all();
+}
+
+
 var stratego_strategy = null;
 function add_listener() {
     let input = document.getElementById("file");
@@ -13481,6 +13553,8 @@ function add_listener() {
     });
 }
 
+
+
         </script>
     </head>
     <body onload="strategy_select();mode_select();display_knowledge();show_words();add_listener()">
@@ -13491,7 +13565,7 @@ function add_listener() {
                 Proposals from the strategy will show up in the right column with the computed "Q-value" shown. Lower Q-values are better (according to the strategy) and the legal words are sorted accordingly.</p><br/>
                 <p>Words that are in the solution-set will be highlighted by bold letters.</p><br/>
                     <p>To use, first input your guess here and in the real <a href=https://www.nytimes.com/games/wordle/index.html>Wordle game</a> then add the response in the "response" box. Lastly press the "update" button to update the memory structure (shown in the bottom), which in turn updates the set of actions (and possibly their ordering) in accordance with (possibly) new Q-values.</p>
-            <p>An unlimited (more than a single daily word) version of worlde can be found <a href=https://wordlegame.org/>here</a></p>
+            <p>An unlimited (more than a single daily word) version of worlde can be found <a href=https://wordlegame.org/>here</a></p>			
             </div>
             <div id="box">
                 Computed Strategy : <input id="file" type="file"/><br/>
@@ -13503,10 +13577,22 @@ function add_listener() {
                 Mode : <select id="mode" onchange="mode_select()">
                 <option value="0">Normal</option>
                 <option value="1" selected >Hard</option>
-                </select><br/><br/><br/>
+                </select><br/>
+				
+				Word to guess: <input id="target_word" value="" name="target_word"><button id="new_game_btn">New game</button> <br/>
+				<script>
+					// pick target word to guess
+					document.getElementById("new_game_btn").addEventListener("click", function () {
+						TARGET = random_target_word();
+						document.getElementById('target_word').value = TARGET["cleartext"];
+					})
+				</script>
+				<br/><br/><br/>
                 Guess: <input id="guess" value="" name=guess /><br/>
                 Response: <input onkeypress="update_all_e(event)" type="text" id="response" value="" name="reponse" /> <br/><br/>
                 0=in place/<span class=green >g</span>reen<br/>1=exists/<span class=yellow>y</span>ellow<br/>2=not in word/<span class=gray>g</span>ray<br/><br/>
+
+
                 <button onclick="update_all()">Update</button><br/>
                 <h3>History:</h3>
                 <div id="history">
