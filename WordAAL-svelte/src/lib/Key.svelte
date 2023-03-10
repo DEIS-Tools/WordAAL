@@ -24,7 +24,7 @@
         line-height: 1;
         transform-origin: 50% 50%;
         user-select: none;
-        background: var(--background, #eee);
+        background: var(--background, #a4aec4);
         color: var(--color, #111);
         border: var(--border, none);
         border-radius: var(--border-radius, 2px);
@@ -34,6 +34,7 @@
         font-size: var(--font-size, 20px);
         font-weight: var(--font-weight, normal);
         height: var(--height, 3.5rem);
+        width: 3.5rem;
         margin: var(--margin, 0.125rem);
         opacity: var(--opacity, 1);
         text-transform: var(--text-transform, none);
@@ -49,7 +50,7 @@
         line-height: 1;
         transform-origin: 50% 50%;
         user-select: none;
-        background: var(--background, rgba(150, 238, 150, 0.81));
+        background: var(--background, rgb(121, 184, 81));
         color: var(--color, #111);
         border: var(--border, none);
         border-radius: var(--border-radius, 2px);
@@ -59,6 +60,7 @@
         font-size: var(--font-size, 20px);
         font-weight: var(--font-weight, normal);
         height: var(--height, 3.5rem);
+        width: 3.5rem;
         margin: var(--margin, 0.125rem);
         opacity: var(--opacity, 1);
         text-transform: var(--text-transform, none);
@@ -74,7 +76,7 @@
         line-height: 1;
         transform-origin: 50% 50%;
         user-select: none;
-        background: var(--background, #eed296);
+        background: var(--background, #f3c237);
         color: var(--color, #111);
         border: var(--border, none);
         border-radius: var(--border-radius, 2px);
@@ -84,6 +86,7 @@
         font-size: var(--font-size, 20px);
         font-weight: var(--font-weight, normal);
         height: var(--height, 3.5rem);
+        width: 3.5rem;
         margin: var(--margin, 0.125rem);
         opacity: var(--opacity, 1);
         text-transform: var(--text-transform, none);

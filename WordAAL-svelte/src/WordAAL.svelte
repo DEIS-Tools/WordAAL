@@ -1,9 +1,16 @@
 <script>
-    import aauLogo from './static/aau-logo.png'
-    import Counter from './lib/Counter.svelte'
     import Keyboard from "svelte-keyboard"
     import Key from './lib/Key.svelte'
-    import Strategy from "./lib/StrategyChooser.svelte";
+    import WordPicker from "./lib/WordPicker.svelte";
+    import StrategyDriver from "./lib/StrategyDriver.svelte";
+    import StrategyChooser from "./lib/StrategyChooser.svelte";
+    import {createEventDispatcher} from "svelte";
+    import {initRandomResponseHistoryStore, responseHistoryStore} from "./lib/stores.js";
+    import ResponseHistory from "./lib/ResponseHistory.svelte";
+    import ProposalChooser from "./lib/ProposalChooser.svelte";
+    import Game from "./lib/Game.svelte";
+
+    const dispatch = createEventDispatcher();
 
     const onKeydown = (event) => {
         console.log(event.detail);
@@ -22,36 +29,65 @@
 
     function handleStrategyConfig(event) {
         console.log(event.detail)
-        return
-        if (event.detail['strategy'] !== 0) { // if legal config
-            console.log(event.detail)
-        }
-
+        dispatch('strategyConfigEvent', event.detail)
     }
 
+    initRandomResponseHistoryStore()
+    console.log($responseHistoryStore)
 </script>
 
 <main>
-    <img class="logo" src={aauLogo}>
     <div class="card">
         {#each wordaalLogo as k}
             <Key {...k}/>
         {/each}
+        <br/>
+        <i>UPPAAL Stratego playing Wordle</i>
     </div>
-    <Strategy on:strategyConfig={handleStrategyConfig}/>
 
-
-    <div>
-        <div class="card">
-            <Keyboard layout="wordle" on:keydown={onKeydown}/>
+    <div class="wrapper">
+        <div class="left">
+            <WordPicker/>
+            <StrategyChooser on:strategyConfigEvent={handleStrategyConfig}/>
         </div>
-        <div class="button">
+        <div class="right">
+            <StrategyDriver on:strategyConfigEvent/>
+
 
         </div>
+        <ResponseHistory/>
+        <ProposalChooser/>
     </div>
+
+    <Game/>
+
+
+    <div class="card">
+        <Keyboard layout="wordle" on:keydown={onKeydown}/>
+    </div>
+
 </main>
 
 <style>
+    .wrapper {
+        width: 1000px;
+        border: 1px solid black;
+        border-radius: 10px;
+        padding: 5px;
+        overflow: hidden; /* will contain if #first is longer than #second */
+    }
+
+    .left {
+        width: 550px;
+        float: left; /* add this */
+        border-radius: 10px;
+    }
+
+    .right {
+        border-radius: 10px;
+        overflow: hidden; /* if you don't want #second to wrap below #first */
+    }
+
     .logo {
         height: 6em;
         padding: 1.5em;

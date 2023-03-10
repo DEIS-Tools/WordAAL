@@ -1,51 +1,76 @@
 <script>
-    import {createEventDispatcher} from "svelte";
+    import {strategyStore} from "./stores.js";
 
-    const dispatch = createEventDispatcher();
-
-    export let hardmode = false;
-    export let strategy = 0
-    let strategies = [
-        {name: "combined", desc: "Combined - both conservative and permissive"},
+    let hardmode = false;
+    let strat = 0
+    let availableStrats = [
+        {
+            name: "combined",
+            desc: "Combined - both conservative and permissive",
+            idx: 1
+        },
         {
             name: "conservative",
-            desc: "Conservative - any prior gray hints respected s.t. no future guesses contain these non-existing letters"
+            desc: "Conservative - any prior gray hints respected s.t. no future guesses contain these non-existing letters",
+            idx: 0,
         },
-        {name: "permissive", desc: "Permissive - any new guess must change the internal knowledge structure"},
+        {
+            name: "permissive",
+            desc: "Permissive - any new guess must change the internal knowledge structure",
+            idx: 2
+        },
     ]
 
-    function emitStrategyConfig(strategy, hardmode) {
-        dispatch('strategyConfig', {
-            strategy,
-            hardmode
-        })
+    //todo, restrict permissive choice to no hard mode w/ alert when choosing
+
+    function setStrategyConfigStore(s, mode) {
+        // return if no strategy selected
+        console.log("setting strategy config store", s, mode)
+        if (s === 0) return;
+        strategyStore.set({
+            idx: s['idx'],
+            hard: mode,
+        });
     }
-    $: emitStrategyConfig(strategy, hardmode)
+
+    // force update when strat changes
+    $: setStrategyConfigStore(strat, hardmode)
 
 </script>
-<div class="strat-select">
-{#each strategies as s}
-    <label>
-        <input type="radio" bind:group={strategy} value="{s}">
-        {s.desc}
-    </label><br>
-{/each}
-<label>
-    <input type="checkbox" bind:checked={hardmode}>
-    Hard-mode
-</label><br>
+<div>
+    <div class="strat-select">
+        <h4>Strategy selection:</h4>
+        {#each availableStrats as s}
+            <label>
+                <input type="radio" bind:group={strat} value="{s}">
+                {s.desc}
+            </label><br>
+        {/each}
+        <label>
+            <input type="checkbox" bind:checked={hardmode} value="false">
+            Hard-mode - must use existing hints in subsequent guesses
+        </label><br>
+    </div>
+    <div class="active-strategy">
+    {#if strat === 0}
+        <h4>Please select a strategy to play with</h4>
+    {:else}
+        <h4>Playing with {strat.name} strategy
+            {#if hardmode} on hard-mode{/if}
+        </h4>
+    {/if}
+    </div>
 </div>
-{#if strategy === 0}
-    <h3>Please select a strategy to play with</h3>
-{:else}
-    <h3>Playing with {strategy.name} strategy
-        {#if hardmode} on hard-mode{/if}
-    </h3>
-{/if}
-
 <style>
     .strat-select {
         text-align: left;
         padding: 2em;
+    }
+    /* active strategy in box*/
+    .active-strategy {
+        text-align: center;
+        padding: 1em;
+        border: 1px solid black;
+        border-radius: 5px;
     }
 </style>
