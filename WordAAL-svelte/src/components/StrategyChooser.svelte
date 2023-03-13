@@ -1,5 +1,5 @@
 <script>
-    import {strategyStore} from "./stores.js";
+    import {strategyStore} from "../stores/stores.js";
 
     let hardmode = false;
     let strat = 0
@@ -25,7 +25,7 @@
 
     function setStrategyConfigStore(s, mode) {
         // return if no strategy selected
-        console.log("setting strategy config store", s, mode)
+        console.log("setting strategy config stores", s, mode)
         if (s === 0) return;
         strategyStore.set({
             idx: s['idx'],
@@ -43,12 +43,12 @@
         {#each availableStrats as s}
             <label>
                 <input type="radio" bind:group={strat} value="{s}">
-                {s.desc}
+                {s.name}
             </label><br>
         {/each}
         <label>
             <input type="checkbox" bind:checked={hardmode} value="false">
-            Hard-mode - must use existing hints in subsequent guesses
+            Hard-mode<!-- - must use existing hints in subsequent guesses-->
         </label><br>
     </div>
     <div class="active-strategy">

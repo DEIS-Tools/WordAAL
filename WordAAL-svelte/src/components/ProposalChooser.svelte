@@ -1,5 +1,5 @@
 <script>
-    import {proposalsStore} from "./stores.js";
+    import {proposalsStore} from "../stores/stores.js";
     import Key from "./Key.svelte";
 
     /*

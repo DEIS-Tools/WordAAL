@@ -6,8 +6,9 @@
         - check guess is legal (5 char, only letters, in wordlist, check is a hard word)
      */
 
-    import {NLETTER, NPOS, NWORDS, WORDS} from "./Consts.svelte";
-    import {proposalsStore, responseHistoryStore, strategyStore} from "./stores.js";
+    import {NLETTER, NPOS, NWORDS, WORDS} from "../lib/Consts.svelte";
+    import {proposalsStore, responseHistoryStore, strategyStore} from "../stores/stores.js";
+    import ResponseHistory from "./ResponseHistory.svelte";
 
 
     let strategiesFilenames = [
@@ -84,9 +85,13 @@
     }
 
 
-    export let guess = "guess";
-    export let response = "21200";
+    export let guess = undefined;
+    export let response = undefined;
 
+
+    $: {
+        //$responseHistoryStore = $responseHistoryStore.push()
+    }
 
     // handle mode and strategy from strategyConfigEvent
     /* 0 = conservative
@@ -531,9 +536,7 @@
 </script>
 
 <div class="driver">
-    <input bind:value={guess} placeholder="guess">
-    <input bind:value={response} placeholder="response">
-    <button on:click={update_all}>Guess</button>
+    <button on:click={update_all}>Query strategy</button>
 </div>
 
 <style>

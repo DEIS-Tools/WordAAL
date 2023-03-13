@@ -1,14 +1,14 @@
 <script>
     import Keyboard from "svelte-keyboard"
-    import Key from './lib/Key.svelte'
-    import WordPicker from "./lib/WordPicker.svelte";
-    import StrategyDriver from "./lib/StrategyDriver.svelte";
-    import StrategyChooser from "./lib/StrategyChooser.svelte";
+    import Key from './components/Key.svelte'
+    import WordPicker from "./components/WordPicker.svelte";
+    import StrategyDriver from "./components/StrategyDriver.svelte";
+    import StrategyChooser from "./components/StrategyChooser.svelte";
     import {createEventDispatcher} from "svelte";
-    import {initRandomResponseHistoryStore, responseHistoryStore} from "./lib/stores.js";
-    import ResponseHistory from "./lib/ResponseHistory.svelte";
-    import ProposalChooser from "./lib/ProposalChooser.svelte";
-    import Game from "./lib/Game.svelte";
+    import {initRandomResponseHistoryStore, responseHistoryStore, targetWordStore} from "./stores/stores"
+    import ResponseHistory from "./components/ResponseHistory.svelte";
+    import ProposalChooser from "./components/ProposalChooser.svelte";
+    import Game from "./components/Game.svelte";
 
     const dispatch = createEventDispatcher();
 
@@ -32,8 +32,6 @@
         dispatch('strategyConfigEvent', event.detail)
     }
 
-    initRandomResponseHistoryStore()
-    console.log($responseHistoryStore)
 </script>
 
 <main>
@@ -51,15 +49,14 @@
             <StrategyChooser on:strategyConfigEvent={handleStrategyConfig}/>
         </div>
         <div class="right">
-            <StrategyDriver on:strategyConfigEvent/>
+            <Game target="{$targetWordStore}"/>
 
 
         </div>
-        <ResponseHistory/>
         <ProposalChooser/>
     </div>
 
-    <Game/>
+    <!--    <Game target="{$targetWordStore}" guess="{$guessWordStore}"/>-->
 
 
     <div class="card">

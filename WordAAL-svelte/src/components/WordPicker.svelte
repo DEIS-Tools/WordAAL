@@ -1,8 +1,12 @@
 <script type="module">
-    import {WORDS, INDEX_LAST_CURATED_WORD, NPOS} from './Consts.svelte';
+    import {WORDS, INDEX_LAST_CURATED_WORD, NPOS} from '../lib/Consts.svelte';
 
-    import {targetWordStore} from "./stores.js";
+    import {targetWordStore} from "../stores/stores.js";
+    import {onMount} from "svelte";
 
+    onMount(() => {
+        random_target_word();
+    });
     function random_target_word() {
 
         let only_curated = true;
