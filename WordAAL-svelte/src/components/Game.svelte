@@ -55,15 +55,34 @@
     }
 
     export function handleGuessInput(event) {
-        if (event.key === "Enter") {
-            if ($responseHistoryStore.length >= 5) {
-                alert("No more guesses, you've lost!")
-            } else {
-                wordleResponse();
-                if ($responseStore.every((x) => x[1] === 0)) {
-                    alert("You've won!");
-                    resetGame();
-                }
+        if (event.key !== "Enter") {
+            return;
+        }
+        // check if guess is legal
+        for (let i = 0; i < $responseHistoryStore.length; i++) {
+
+            // join response history element into string
+            let w = "";
+            $responseHistoryStore[i].forEach((x) => w += x[0]);
+
+            if (w === $guessStore) {
+                // if guess is in history, alert user
+                alert("You've already guessed that word!")
+                return;
+            }
+        }
+        if ($responseHistoryStore.length >= 5) {
+            alert("No more guesses, you've lost!")
+
+        } else if ($responseHistoryStore.some((x) => x[0] === $guessStore)) {
+            // if guess is in history, alert user
+            alert("You've already guessed that word!")
+        } else {
+            // guess is legal, calc response and check for win condition
+            wordleResponse();
+            if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
+                alert("You've won!");
+                resetGame();
             }
         }
     }

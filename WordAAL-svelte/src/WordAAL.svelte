@@ -16,13 +16,13 @@
         console.log(event.detail);
     }
 
-    $: {
+/*    $: {
         console.log("guessStore", $guessStore);
         console.log("responseStore", $responseStore);
         console.log("responseHistoryStore", $responseHistoryStore);
         console.log("targetWordStore", $targetWordStore);
         console.log("newGameTrigger", $newGameTrigger);
-    }
+    }*/
 
     // declare logo
     let wordaalLogo = [
