@@ -1,24 +1,38 @@
 <script>
     import {NLETTER, NPOS, NWORDS, WORDS} from "../lib/Consts.svelte";
-    import Key from "./Key.svelte";
     import StrategyDriver from "./StrategyDriver.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
-    import {guessStore, responseStore, responseHistoryStore, targetWordStore} from "../stores/stores.js";
-    import {get} from "svelte/store";
+    import {
+        guessStore,
+        responseStore,
+        responseHistoryStore,
+        targetWordStore,
+        newGameTrigger,
+    } from "../stores/stores.js";
     import {onMount} from "svelte";
 
     onMount(() => {
         console.log("onMount game");
-        guessStore.set("aeiou");
     });
 
-
     // when response changes, append it to history stores
-    $: if ($responseStore !== undefined) {
-        responseHistoryStore.update((history) => {
-            history.push($responseStore);
-            return history;
-        });
+    $: if ($responseHistoryStore !== undefined && $responseStore !== undefined) {
+        // check if first element is empty array
+        if ($responseHistoryStore.length === 1 && $responseHistoryStore[0].length === 0) {
+            // slice 1 to last element in array
+            responseHistoryStore.set($responseHistoryStore.slice(1));
+        }
+        responseHistoryStore.set([...$responseHistoryStore, $responseStore]);
+    } else {
+        responseHistoryStore.set($responseStore);
+    }
+
+    export function resetGame() {
+        console.warn("resetGame");
+        guessStore.set("");
+        responseStore.set([]);
+        responseHistoryStore.set([]);
+        newGameTrigger.set(true);
     }
 
     export function wordleResponse() {
@@ -40,21 +54,24 @@
         responseStore.set(res);
     }
 
-    /*
-    Demo response:
-{#each wordleResponse(target, guess) as k}
-    <Key value={k[0].toUpperCase()} state={k[1]}/>
-{/each}
-
-     */
+    export function handleGuessInput(event) {
+        if (event.key === "Enter") {
+            if ($responseHistoryStore.length >= 5) {
+                alert("No more guesses, you've lost!")
+            } else {
+                wordleResponse();
+                if ($responseStore.every((x) => x[1] === 0)) {
+                    alert("You've won!");
+                    resetGame();
+                }
+            }
+        }
+    }
 </script>
 
-<button on:click={wordleResponse}>Submit</button>
+<!--Pressing enter in textinput called wordleResponse-->
+<input type="text" bind:value={$guessStore} on:keypress={handleGuessInput} maxlength={NPOS} placeholder="guess">
 
-<input bind:value={$guessStore} placeholder="guess">
 
-
-<input bind:value={$responseStore} placeholder="response" contenteditable="false">
-
-<StrategyDriver target={$targetWordStore['cleartext']} guess={$guessStore}/>
+<StrategyDriver target={$targetWordStore['cleartext']} guess="cedar"/>
 <ResponseHistory response={$responseStore}/>

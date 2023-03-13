@@ -1,31 +1,23 @@
 <script>
-    import {responseHistoryStore, targetWordStore, responseStore} from '../stores/stores.js';
-    import {ASCII_OFFSET, NPOS} from "../lib/Consts.svelte";
+    import {responseHistoryStore} from '../stores/stores.js';
     import Key from "./Key.svelte";
-
-
-    let responses = [];
-
-    $: {
-        responses = $responseHistoryStore;
-    }
-
-
 </script>
 
 <div class="history">
     <table>
         <tr>
-            {#if ($responseHistoryStore.length > 0)}
-                {#each $responseHistoryStore as responseHistory, idxWord}
-                    {#each responseHistory as guess, idxLetter}
-                        <!--{guess[0]} {idxLetter}-->
-                        <Key value={guess[0].toUpperCase()}
-                             state={guess[1]}/>
-                    {/each}
-                    <br/>
+            {#if ($responseHistoryStore !== undefined && $responseHistoryStore.length > 0)}
+                {#if $responseHistoryStore[0].length > 0}
+                    {#each $responseHistoryStore as responseHistory, idxWord}
+                        {idxWord + 1}
+                        {#each responseHistory as guess, idxLetter}
+                            <Key value={guess[0].toUpperCase()}
+                                 state={guess[1]}/>
+                        {/each}
+                        <br/>
 
-                {/each}
+                    {/each}
+                {/if}
             {/if}
         </tr>
     </table>

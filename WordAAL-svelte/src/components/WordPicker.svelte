@@ -1,13 +1,13 @@
 <script type="module">
     import {WORDS, INDEX_LAST_CURATED_WORD, NPOS} from '../lib/Consts.svelte';
 
-    import {targetWordStore} from "../stores/stores.js";
+    import {newGameTrigger, targetWordStore} from "../stores/stores.js";
     import {onMount} from "svelte";
 
     onMount(() => {
-        random_target_word();
+        randomTargetWord();
     });
-    function random_target_word() {
+    function randomTargetWord() {
 
         let only_curated = true;
 
@@ -24,10 +24,17 @@
         targetWordStore.set({cleartext: target, index: index, chars: WORDS[index]});
     }
 
+    $: {
+        if ($newGameTrigger) {
+            randomTargetWord();
+            newGameTrigger.set(false);
+        }
+    }
+
 </script>
 
 <div>
-    <button on:click={random_target_word}>Pick new word</button>
+    <button on:click={randomTargetWord}>Pick new word</button>
     <input bind:value={$targetWordStore['cleartext']} placeholder="Word to guess" id="targetWord">
 </div>
 

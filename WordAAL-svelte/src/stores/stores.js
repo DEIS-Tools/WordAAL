@@ -7,10 +7,10 @@ export const strategyStore = writable({strat: "", hard: false});
 
 // 0 in place, 1 exists, 2 not in word
 // format: [[g,0], [u,1], [e,1], [s,0], [s,0], ... , ]
-export const responseHistoryStore = writable([]);
+export const responseHistoryStore = writable();
 
 
-export function initRandomResponseHistoryStore() {
+/*export function initRandomResponseHistoryStore() {
     function getRandomInt(min, max) {
         min = Math.ceil(min);
         max = Math.floor(max);
@@ -24,9 +24,12 @@ export function initRandomResponseHistoryStore() {
         responseHistory.push(word);
     }
     responseHistoryStore.set(responseHistory);
-}
+}*/
 
 export const responseStore = writable([]);
 export const guessStore = writable();
 
 export const proposalsStore = writable();
+
+export const newGameTrigger = writable(false);
+

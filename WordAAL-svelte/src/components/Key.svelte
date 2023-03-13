@@ -3,9 +3,13 @@
     const states = [0, 1, 2];
     export let state = 0;
 
+    export let clickable = false;
+
     function cycleColorsOnClick() {
-        console.log("changing key: " + value + " to " + state)
-        state = (state + 1) % states.length;
+        if (clickable) {
+            console.log("changing key: " + value + " to " + state)
+            state = (state + 1) % states.length;
+        }
     }
 </script>
 

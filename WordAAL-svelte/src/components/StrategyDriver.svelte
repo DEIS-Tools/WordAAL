@@ -355,7 +355,7 @@
         if (strategy === 0) {
             update_conservative(response, num_guess);
         }
-        if (strategy == 1 || strategy == 2) {
+        if (strategy === 1 || strategy === 2) {
             update_permissive(response, num_guess);
         }
         display_knowledge();
@@ -400,7 +400,7 @@
         if (stratego_strategy === null) return Infinity;
         let mn = Infinity;
         for (let wid = 0; wid < NWORDS; ++wid) {
-            if (consistent(wid) === null && (mode == 0 || hard[wid])) {
+            if (consistent(wid) === null && (mode === 0 || hard[wid])) {
                 mn = Math.min(mn, strategy_lookup(wid));
             }
         }
@@ -481,8 +481,8 @@
     function display_knowledge() {
         let knhtml = "";
         for (let p = 0; p < NPOS; ++p) {
-            if (p != 0) knhtml += "<br/>";
-            if (p == 0) {
+            if (p !== 0) knhtml += "<br/>";
+            if (p === 0) {
                 for (let l = 0; l < NLETTER; ++l)
                     knhtml += "<span class='yellow'>" + counts[l] + "</span>";
                 knhtml += "<br/>";
@@ -490,9 +490,9 @@
             for (let l = 0; l < NLETTER; ++l) {
                 const k = knowledge[p][l];
                 knhtml += "<span class='";
-                if (k == -1) {
+                if (k === -1) {
                     knhtml += "gray";
-                } else if (k == 1) {
+                } else if (k === 1) {
                     knhtml += "green";
                 } else {
                     knhtml += "white";

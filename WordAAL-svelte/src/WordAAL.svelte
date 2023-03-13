@@ -5,7 +5,7 @@
     import StrategyDriver from "./components/StrategyDriver.svelte";
     import StrategyChooser from "./components/StrategyChooser.svelte";
     import {createEventDispatcher} from "svelte";
-    import {initRandomResponseHistoryStore, responseHistoryStore, targetWordStore} from "./stores/stores"
+    import {guessStore, newGameTrigger, responseHistoryStore, responseStore, targetWordStore} from "./stores/stores"
     import ResponseHistory from "./components/ResponseHistory.svelte";
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
@@ -14,6 +14,14 @@
 
     const onKeydown = (event) => {
         console.log(event.detail);
+    }
+
+    $: {
+        console.log("guessStore", $guessStore);
+        console.log("responseStore", $responseStore);
+        console.log("responseHistoryStore", $responseHistoryStore);
+        console.log("targetWordStore", $targetWordStore);
+        console.log("newGameTrigger", $newGameTrigger);
     }
 
     // declare logo
@@ -37,7 +45,7 @@
 <main>
     <div class="card">
         {#each wordaalLogo as k}
-            <Key {...k}/>
+            <Key {...k} clickable="true"/>
         {/each}
         <br/>
         <i>UPPAAL Stratego playing Wordle</i>
