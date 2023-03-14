@@ -4,6 +4,29 @@
     export const NLETTER = 26;
     export const NPOS = 5;
     export const INDEX_LAST_CURATED_WORD = 2314;
+    export function convertStringToCharArray(str) {
+        const res = new Array(str.length);
+        for (let i = 0; i < str.length; i++) {
+            res[i] = str.charCodeAt(i) - ASCII_OFFSET;
+        }
+        return res;
+    }
+
+    export function arraysEqual(a, b) {
+        if (a === b) return true;
+        if (a == null || b == null) return false;
+        if (a.length !== b.length) return false;
+
+        // If you don't care about the order of the elements inside
+        // the array, you should sort both arrays here.
+        // Please note that calling sort on an array will modify that array.
+        // you might want to clone your array first.
+
+        for (var i = 0; i < a.length; ++i) {
+            if (a[i] !== b[i]) return false;
+        }
+        return true;
+    }
     export const WORDS = [
         [0, 1, 0, 2, 10],     //     0: aback
         [0, 1, 0, 18, 4],     //     1: abase

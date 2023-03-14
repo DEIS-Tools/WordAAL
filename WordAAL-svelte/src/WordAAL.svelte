@@ -16,15 +16,14 @@
         console.log(event.detail);
     }
 
-/*    $: {
-        console.log("guessStore", $guessStore);
-        console.log("responseStore", $responseStore);
-        console.log("responseHistoryStore", $responseHistoryStore);
-        console.log("targetWordStore", $targetWordStore);
-        console.log("newGameTrigger", $newGameTrigger);
-    }*/
+    /*    $: {
+            console.log("guessStore", $guessStore);
+            console.log("responseStore", $responseStore);
+            console.log("responseHistoryStore", $responseHistoryStore);
+            console.log("targetWordStore", $targetWordStore);
+            console.log("newGameTrigger", $newGameTrigger);
+        }*/
 
-    // declare logo
     let wordaalLogo = [
         {value: "W", state: 0},
         {value: "o", state: 1},
@@ -35,6 +34,7 @@
         {value: "L", state: 2},
     ]
 
+    // todo: unused, make all communication through stores
     function handleStrategyConfig(event) {
         console.log(event.detail)
         dispatch('strategyConfigEvent', event.detail)
@@ -53,22 +53,33 @@
 
     <div class="wrapper">
         <div class="left">
-            <WordPicker/>
-            <StrategyChooser on:strategyConfigEvent={handleStrategyConfig}/>
-        </div>
-        <div class="right">
             <Game target="{$targetWordStore}"/>
 
 
         </div>
-        <ProposalChooser/>
-    </div>
+        <div class="right">
+            <StrategyDriver target={$targetWordStore['cleartext']} guess="cedar"/>
 
-    <!--    <Game target="{$targetWordStore}" guess="{$guessWordStore}"/>-->
+            <ProposalChooser/>
+
+        </div>
+    </div>
 
 
     <div class="card">
         <Keyboard layout="wordle" on:keydown={onKeydown}/>
+    </div>
+
+    <div class="settings">
+        <div class="wrapper">
+            <div class="left">
+                <WordPicker/>
+            </div>
+            <div class="right">
+                <StrategyChooser on:strategyConfigEvent={handleStrategyConfig}/>
+            </div>
+        </div>
+
     </div>
 
 </main>

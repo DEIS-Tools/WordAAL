@@ -70,7 +70,5 @@
     .active-strategy {
         text-align: center;
         padding: 1em;
-        border: 1px solid black;
-        border-radius: 5px;
     }
 </style>

@@ -31,7 +31,6 @@
     }
 
 </script>
-<div id="divider"></div>
 <div class="proposals-box">
     <table>
         <tr>
