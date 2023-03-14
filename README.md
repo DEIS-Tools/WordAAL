@@ -3,6 +3,7 @@ Interactive Wordle-like demo showcasing the resulting strategies from the paper 
 
 ## Todo (in order of priority)
 - [x] Get basic Wordle game working
+- [x] Integrate keyboard guess input
 - [ ] Get strategy-driver working; user needs to be able to pick top N best words given the current knowledge for each strategy.
 - [ ] Versus mode: Human plays concurrently against chosen strategy, only revealing strategy-move after human move.
 - [ ] Polish UI and UX
@@ -10,7 +11,7 @@ Interactive Wordle-like demo showcasing the resulting strategies from the paper 
 - [ ] (Maybe) Add backend, allowing staff to pick moves, step back, forwards to demo specific features from separate device.
 
 ## Dev setup
-Not using SvelteKit, so no need to install anything globaly. Just run the following commands in the `WordAAL-svelte/` folder:
+Not using SvelteKit, so no need to install anything globally. Just run the following commands in the `WordAAL-svelte/` folder:
 ```
 npm install
 npm run dev
