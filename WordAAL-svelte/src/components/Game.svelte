@@ -1,5 +1,13 @@
 <script>
-    import {NLETTER, NPOS, NWORDS, WORDS, convertStringToCharArray, arraysEqual} from "../lib/Consts.svelte";
+    import {
+        NLETTER,
+        NPOS,
+        NWORDS,
+        WORDS,
+        convertStringToCharArray,
+        arraysEqual,
+        wordInWordlist
+    } from "../lib/Consts.svelte";
     import StrategyDriver from "./StrategyDriver.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
     import {
@@ -8,24 +16,17 @@
         responseHistoryStore,
         targetWordStore,
         newGameTrigger,
+        guessSubmitTrigger,
     } from "../stores/stores.js";
+    import Button from '@smui/button';
+
     import {onMount} from "svelte";
+    import Textfield from "@smui/textfield";
 
     onMount(() => {
         console.log("onMount game");
     });
 
-    // when response changes, append it to history stores
-    $: if ($responseHistoryStore !== undefined && $responseStore !== undefined) {
-        // check if first element is empty array
-        if ($responseHistoryStore.length === 1 && $responseHistoryStore[0].length === 0) {
-            // slice 1 to last element in array
-            responseHistoryStore.set($responseHistoryStore.slice(1));
-        }
-        responseHistoryStore.set([...$responseHistoryStore, $responseStore]);
-    } else {
-        responseHistoryStore.set($responseStore);
-    }
 
     export function resetGame() {
         console.warn("resetGame");
@@ -36,7 +37,8 @@
     }
 
     export function wordleResponse() {
-        if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined) {
+        if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {
+            console.error("wordleResponse: targetWord or guess is undefined or guess is not NPOS long")
             return;
         }
         const correctLetters = new Set($targetWordStore['cleartext']);
@@ -51,51 +53,61 @@
                 res[i] = [$guessStore[i], 2];
             }
         }
-        responseStore.set(res);
-    }
 
-    export function handleGuessInput(event) {
-        if (event.key !== "Enter") {
+        // check legality of res
+        if (res.length !== NPOS) {
+            console.error("wordleResponse: res is not NPOS long");
             return;
         }
 
-        let guessCharArray = convertStringToCharArray($guessStore);
+        responseStore.set(res);
+        // reset guessStore
+        guessStore.set("");
 
+        // check that res is last element of responseStore
+        if ($responseStore !== res) {
+            console.error("wordleResponse: res is not last element of responseStore, got: " + $responseStore + " expected: " + res);
+        }
+
+        responseHistoryStore.update((x) => {
+            // if default val, update in-place
+            if (x.length === 1 && x[0].length === 0) {
+                return [$responseStore];
+            } else {
+                return [...x, $responseStore];
+            }
+        })
+
+    }
+
+    export function handleGuessInput(event) {
+        if (event.key === "Enter") {
+            checkGuess();
+        }
+    }
+
+    function guessInHistory(guess) {
+        // given guess as string, check if it is in responseHistoryStore which has format [['a', 0], ['a', 0], ['a', 0], ['a', 0], ['a', 0]
+        for (let i = 0; i < $responseHistoryStore.length; i++) {
+            // make string from first element in array of responseHistoryStore
+            if ($responseHistoryStore[i].map((x) => x[0]).join("") === guess) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    export function checkGuess() {
         if ($guessStore.length !== NPOS) {
-            // if guess is not NPOS long, alert user
             alert("Guess must be 5 letters long!");
         } else if ($responseHistoryStore.length >= 5) {
             alert("No more guesses, you've lost!");
-        } else if ($responseHistoryStore.some((x) => x[0] === $guessStore)) {
-            // if guess is in history, alert user
+        } else if (guessInHistory($guessStore)) {
             alert("You've already guessed that word!");
+        } else if (!wordInWordlist($guessStore)) {
+            alert("That word is not in the wordlist!");
         } else {
-
-
-            let inWordlist = false;
-            for (let i = 0; i < NWORDS; i++) {
-                if (arraysEqual(guessCharArray, WORDS[i])) {
-                    inWordlist = true;
-                    break;
-                }
-            }
-            if (!inWordlist) {
-                // if guess word is not in wordlist, alert user
-                alert("That word is not in the wordlist!");
-                return;
-            }
-
-            // get previous guess word as string
-            for (let i = 0; i < $responseHistoryStore.length; i++) {
-                // join response history element into string
-                let w = "";
-                $responseHistoryStore[i].forEach((x) => w += x[0]);
-                if (w === $guessStore) {
-                    // if guess is in history, alert user
-                    alert("You've already guessed that word!")
-                    return;
-                }
-            }
             // guess is legal, calc response and check for win condition
             wordleResponse();
             if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
@@ -104,9 +116,19 @@
             }
         }
     }
-</script>
 
-<input type="text" bind:value={$guessStore} on:keypress={handleGuessInput} maxlength={NPOS} placeholder="guess">
-<button on:click={handleGuessInput}>Guess</button>
+    // if guessSubmitTrigger is set call checkGuess
+    $: if ($guessSubmitTrigger) {
+        guessSubmitTrigger.update((x) => {
+            checkGuess();
+            return !x;
+        });
+    }
+
+</script>
+<Button variant="raised" on:click={checkGuess}>Guess</Button>
+<Textfield variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
+           input$maxlength={NPOS} autofocus/>
+
 
 <ResponseHistory response={$responseStore}/>

@@ -9,6 +9,7 @@
     import {NLETTER, NPOS, NWORDS, WORDS} from "../lib/Consts.svelte";
     import {proposalsStore, responseHistoryStore, strategyStore} from "../stores/stores.js";
     import ResponseHistory from "./ResponseHistory.svelte";
+    import Button from "@smui/button";
 
 
     let strategiesFilenames = [
@@ -536,7 +537,7 @@
 </script>
 
 <div class="driver">
-    <button on:click={update_all}>Query strategy</button>
+    <Button variant="raised" on:click={update_all}>Query strategy</Button>
 </div>
 
 <style>

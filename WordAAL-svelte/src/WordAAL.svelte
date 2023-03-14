@@ -1,3 +1,10 @@
+<svelte:head>
+    <link
+            rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/svelte-material-ui@6.0.0/bare.min.css"
+    />
+</svelte:head>
+
 <script>
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
@@ -5,15 +12,41 @@
     import StrategyDriver from "./components/StrategyDriver.svelte";
     import StrategyChooser from "./components/StrategyChooser.svelte";
     import {createEventDispatcher} from "svelte";
-    import {guessStore, newGameTrigger, responseHistoryStore, responseStore, targetWordStore} from "./stores/stores"
-    import ResponseHistory from "./components/ResponseHistory.svelte";
+    import {guessStore, guessSubmitTrigger, targetWordStore} from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
 
     const dispatch = createEventDispatcher();
 
-    const onKeydown = (event) => {
-        console.log(event.detail);
+    const onWordleKeyDown = (event) => {
+        // backspace: remove the last character
+        if (event.detail === "Backspace") {
+            guessStore.update((guess) => {
+                return guess.slice(0, -1);
+            });
+            return;
+        }
+
+        // enter: check guess
+        if (event.detail === "Enter") {
+            guessSubmitTrigger.set(true);
+            return;
+        }
+
+        // only allow 5 characters
+        if ($guessStore.length >= 5) {
+            return;
+        }
+
+        guessStore.update((guess) => {
+            // fixme: irrelevant guard (perhaps)
+            if (guess.length <= 4 && event.detail !== "backspace" && event.detail !== "enter") {
+                return guess + event.detail;
+            } else {
+                return guess;
+            }
+        });
+
     }
 
     /*    $: {
@@ -67,7 +100,7 @@
 
 
     <div class="card">
-        <Keyboard layout="wordle" on:keydown={onKeydown}/>
+        <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
     </div>
 
     <div class="settings">
@@ -95,12 +128,14 @@
 
     .left {
         width: 550px;
-        float: left; /* add this */
+        float: left;
+        padding: 5px;
         border-radius: 10px;
     }
 
     .right {
         border-radius: 10px;
+        padding: 5px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
     }
 

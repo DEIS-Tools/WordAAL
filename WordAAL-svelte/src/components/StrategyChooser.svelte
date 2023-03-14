@@ -1,5 +1,10 @@
 <script>
     import {strategyStore} from "../stores/stores.js";
+    import SegmentedButton, { Segment } from '@smui/segmented-button';
+    import { Label } from '@smui/common';
+    import Switch from '@smui/switch';
+    import FormField from '@smui/form-field';
+
 
     let hardmode = false;
     let strat = 0
@@ -37,30 +42,24 @@
     $: setStrategyConfigStore(strat, hardmode)
 
 </script>
-<div>
-    <div class="strat-select">
-        <h4>Strategy selection:</h4>
-        {#each availableStrats as s}
-            <label>
-                <input type="radio" bind:group={strat} value="{s}">
-                {s.name}
-            </label><br>
-        {/each}
-        <label>
-            <input type="checkbox" bind:checked={hardmode} value="false">
-            Hard-mode<!-- - must use existing hints in subsequent guesses-->
-        </label><br>
-    </div>
-    <div class="active-strategy">
-    {#if strat === 0}
-        <h4>Please select a strategy to play with</h4>
-    {:else}
-        <h4>Playing with {strat.name} strategy
-            {#if hardmode} on hard-mode{/if}
-        </h4>
-    {/if}
-    </div>
+
+
+
+<div class="strategies">
+    <SegmentedButton segments={availableStrats} let:segment singleSelect bind:strat>
+        <!-- Note: the `segment` property is required! -->
+        <Segment {segment} touch title={segment.name}>
+            <Label>{segment.name}</Label>
+        </Segment>
+    </SegmentedButton>
+
+
+    <FormField>
+        <Switch bind:checked={hardmode} touch/>
+        <span slot="label">Hard-mode</span>
+    </FormField>
 </div>
+
 <style>
     .strat-select {
         text-align: left;

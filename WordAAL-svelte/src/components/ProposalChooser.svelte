@@ -32,25 +32,15 @@
 
 </script>
 <div class="proposals-box">
-    <table>
-        <tr>
-            {#each proposals as proposal}
-                <div class="proposal" id="proposal-wid-{proposal.wid}" on:click={propose(proposal.wid)}>
-                    <tr>
-                        <td>
-                            {#each proposal.word as char}
-                                <Key value={char.toUpperCase()} state="2"/>
-                            {/each}
-                        </td>
-                        <td>
-                            ({proposal.cost}) <br/>
-                        </td>
-                    </tr>
-                </div>
-
+    {#each proposals as proposal}
+        <div class="proposal" id="proposal-wid-{proposal.wid}" on:click={propose(proposal.wid)}>
+            {#each proposal.word as char}
+                <Key value={char.toUpperCase()} state="2"/>
             {/each}
-        </tr>
-    </table>
+            ({proposal.cost}) <br/>
+        </div>
+
+    {/each}
 </div>
 
 <style>

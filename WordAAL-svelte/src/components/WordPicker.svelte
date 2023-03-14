@@ -3,27 +3,29 @@
 
     import {newGameTrigger, targetWordStore} from "../stores/stores.js";
     import {onMount} from "svelte";
+    import Button from "@smui/button";
+    import Textfield from "@smui/textfield";
 
     onMount(() => {
         randomTargetWord();
     });
+
     function randomTargetWord() {
+        let onlyCurated = true;
 
-        let only_curated = true;
+        const index = Math.floor(Math.random() * (onlyCurated ? INDEX_LAST_CURATED_WORD : WORDS.length));
 
-        const index = Math.floor(Math.random() * (only_curated ? INDEX_LAST_CURATED_WORD : WORDS.length));
+        // clone WORDS[index] to target
+        let target = JSON.parse(JSON.stringify(WORDS[index]));
 
-        //const index = 1854; // word: speak
-        console.log(WORDS[1854])
-        var target = WORDS[index];
-        for (var i = 0; i < NPOS; i++) {
+        for (let i = 0; i < NPOS; i++) {
             target[i] = String.fromCharCode(WORDS[index][i] + 97);
         }
         target = target.join('');
-        console.log("target word: " + target + " at i: " + index);
         targetWordStore.set({cleartext: target, index: index, chars: WORDS[index]});
     }
 
+    //fixme: rewrite to update store statement
     $: {
         if ($newGameTrigger) {
             randomTargetWord();
@@ -34,11 +36,17 @@
 </script>
 
 <div>
-    <button on:click={randomTargetWord}>Pick new word</button>
-    <input bind:value={$targetWordStore['cleartext']} placeholder="Word to guess" id="targetWord">
+    <Button variant="raised" on:click={randomTargetWord}>Pick new word</Button>
+    <Textfield variant="filled" bind:value={$targetWordStore['cleartext']} label="Word to guess" disabled/>
 </div>
 
 <style>
-#targetWord:hover input{display:block;}
+    #targetWord:hover {
+        display: block;
+    }
+
+    #targetWord {
+        display: none;
+    }
 </style>
 
