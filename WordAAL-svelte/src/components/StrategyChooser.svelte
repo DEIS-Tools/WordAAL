@@ -1,13 +1,17 @@
 <script>
     import {strategyStore} from "../stores/stores.js";
-    import SegmentedButton, { Segment } from '@smui/segmented-button';
-    import { Label } from '@smui/common';
+    import SegmentedButton, {Segment} from '@smui/segmented-button';
+    import {Label} from '@smui/common';
     import Switch from '@smui/switch';
     import FormField from '@smui/form-field';
 
 
     let hardmode = false;
-    let strat = 0
+    let strategy = {
+        name: "combined",
+        desc: "Combined - both conservative and permissive",
+        idx: 1
+    };
     let availableStrats = [
         {
             name: "combined",
@@ -26,45 +30,46 @@
         },
     ]
 
-    //todo, restrict permissive choice to no hard mode w/ alert when choosing
-
-    function setStrategyConfigStore(s, mode) {
-        // return if no strategy selected
-        console.log("setting strategy config stores", s, mode)
-        if (s === 0) return;
-        strategyStore.set({
-            idx: s['idx'],
-            hard: mode,
-        });
+    $: {
+        if (strategy.name === "permissive" && hardmode) {
+            alert("Permissive mode is not compatible with hard mode. Please choose a different strategy or turn off hard mode.")
+            hardmode = false;
+        } else {
+            // set strategy config store
+            let s_idx = availableStrats.find(s => s.name === strategy.name)['idx'];
+            if (s_idx !== undefined) {
+                strategyStore.set({
+                    idx: s_idx,
+                    hard: hardmode,
+                });
+            } else {
+                console.error("strategy index not found")
+            }
+        }
     }
-
-    // force update when strat changes
-    $: setStrategyConfigStore(strat, hardmode)
 
 </script>
 
 
-
 <div class="strategies">
-    <SegmentedButton segments={availableStrats} let:segment singleSelect bind:strat>
-        <!-- Note: the `segment` property is required! -->
+    <SegmentedButton segments={availableStrats} let:segment singleSelect bind:selected={strategy}>
         <Segment {segment} touch title={segment.name}>
             <Label>{segment.name}</Label>
         </Segment>
     </SegmentedButton>
-
-
     <FormField>
         <Switch bind:checked={hardmode} touch/>
         <span slot="label">Hard-mode</span>
     </FormField>
 </div>
 
+
 <style>
     .strat-select {
         text-align: left;
         padding: 2em;
     }
+
     /* active strategy in box*/
     .active-strategy {
         text-align: center;
