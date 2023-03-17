@@ -7,6 +7,7 @@ Interactive Wordle-like demo showcasing the resulting strategies from the paper 
 - [ ] Get strategy-driver working; user needs to be able to pick top N best words given the current knowledge for each strategy.
 - [ ] Versus mode: Human plays concurrently against chosen strategy, only revealing strategy-move after human move.
 - [ ] Polish UI and UX
+- [ ] Migrate alerts to toasts
 - [ ] Cheatmode: Further sort Q-value best moves by simulating each move against Game and sorting them by largest knowledge gained (minimising summed response e.g. response 00022=4 > 00111=3, here 00111 is perhaps better, but doesn't reveal placement)
 - [ ] (Maybe) Add backend, allowing staff to pick moves, step back, forwards to demo specific features from separate device.
 

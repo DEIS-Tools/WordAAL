@@ -12,6 +12,14 @@
         return res;
     }
 
+    export function convertCharArrayToString(arr) {
+        const res = new Array(arr.length);
+        for (let i = 0; i < arr.length; i++) {
+            res[i] = String.fromCharCode(arr[i] + ASCII_OFFSET);
+        }
+        return res.join('');
+    }
+
     export function arraysEqual(a, b) {
         if (a === b) return true;
         if (a == null || b == null) return false;

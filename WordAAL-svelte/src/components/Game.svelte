@@ -25,6 +25,7 @@
 
     onMount(() => {
         console.log("onMount game");
+        guessStore.set("cedar");
     });
 
 
@@ -95,14 +96,11 @@
             }
         }
         return false;
-
     }
 
     export function checkGuess() {
         if ($guessStore.length !== NPOS) {
             alert("Guess must be 5 letters long!");
-        } else if ($responseHistoryStore.length >= 5) {
-            alert("No more guesses, you've lost!");
         } else if (guessInHistory($guessStore)) {
             alert("You've already guessed that word!");
         } else if (!wordInWordlist($guessStore)) {
@@ -112,6 +110,9 @@
             wordleResponse();
             if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
                 alert("You've won!");
+                resetGame();
+            } else if ($responseHistoryStore.length >= 5) {
+                alert("You've lost!");
                 resetGame();
             }
         }

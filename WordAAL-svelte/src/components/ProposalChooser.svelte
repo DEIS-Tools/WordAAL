@@ -1,5 +1,5 @@
 <script>
-    import {proposalsStore} from "../stores/stores.js";
+    import {guessStore, guessSubmitTrigger, proposalsStore} from "../stores/stores.js";
     import Key from "./Key.svelte";
 
     /*
@@ -11,37 +11,44 @@
 
     // autosub to proposalsStore
     let proposals = [];
+    export let num_results = 5;
     $: {
         let p = $proposalsStore;
         // check type is array
         if (!Array.isArray(p)) {
-            console.log("proposalsStore is not an array, perhaps StrategyDriver has not completed");
+            console.log("proposalsStore is not an array, perhaps StrategyDriver has not finished");
         } else {
-            console.log("proposalsStore from ProposalChooser");
             // log word and cost for each
             p.forEach((proposal) => {
-                console.log(proposal.word, proposal.cost);
+                //console.log(proposal.word, proposal.cost);
             });
-            proposals = p.slice(0, 3);
+            let topN = p.slice(0, num_results);
+            console.log(topN);
+            proposals = topN;
         }
     }
 
-    function propose(wid) {
-        console.log("proposal clicked: " + wid);
+    function propose(guess) {
+        console.log("proposal chosen: " + guess);
+        guessStore.set(guess);
+        guessSubmitTrigger.set(true);
     }
 
 </script>
-<div class="proposals-box">
-    {#each proposals as proposal}
-        <div class="proposal" id="proposal-wid-{proposal.wid}" on:click={propose(proposal.wid)}>
-            {#each proposal.word as char}
-                <Key value={char.toUpperCase()} state="2"/>
-            {/each}
-            ({proposal.cost}) <br/>
-        </div>
 
-    {/each}
-</div>
+<!--For each proposal, render them as five keys with state=2. Linebreak s.t. subsequent proposals are placed below the previous -->
+{#each proposals as proposal}
+    <div class="proposals-box">
+        <div class="proposal" on:click={() => propose(proposal.word)}>
+            {#each proposal.word as letter}
+                <Key value={letter} state={2}/>
+            {/each}
+            <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(2)}</div>
+
+        </div>
+    </div>
+{/each}
+
 
 <style>
 
@@ -57,8 +64,6 @@
         flex-direction: row;
         justify-content: left;
         align-items: center;
-        padding: 5px;
-        margin: 5px;
         border-radius: 5px;
         background-color: rgba(255, 255, 255, 0.81);
     }
@@ -72,7 +77,5 @@
         display: flex;
         flex-direction: row;
         float: inside;
-        padding: 5px;
-        margin: 5px;
     }
 </style>

@@ -17,7 +17,6 @@
 
         // clone WORDS[index] to target
         let target = JSON.parse(JSON.stringify(WORDS[index]));
-
         for (let i = 0; i < NPOS; i++) {
             target[i] = String.fromCharCode(WORDS[index][i] + 97);
         }

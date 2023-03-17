@@ -6,7 +6,7 @@
     import FormField from '@smui/form-field';
 
 
-    let hardmode = false;
+    let hard = false;
     let strategy = {
         name: "combined",
         desc: "Combined - both conservative and permissive",
@@ -16,35 +16,34 @@
         {
             name: "combined",
             desc: "Combined - both conservative and permissive",
-            idx: 1
+            location: "COMB_PT.json",
+            location_hard: "COMB_HM_PT.json"
         },
         {
             name: "conservative",
             desc: "Conservative - any prior gray hints respected s.t. no future guesses contain these non-existing letters",
-            idx: 0,
+            location: "CONS_PT.json",
+            location_hard: "CONS_HM_PT.json"
         },
         {
             name: "permissive",
             desc: "Permissive - any new guess must change the internal knowledge structure",
-            idx: 2
+            location_hard: "PERM_HM_PT.json",
         },
     ]
 
     $: {
-        if (strategy.name === "permissive" && hardmode) {
-            alert("Permissive mode is not compatible with hard mode. Please choose a different strategy or turn off hard mode.")
-            hardmode = false;
+        if (strategy.name === "permissive" && !hard) {
+            alert("Permissive mode is only compatible with hard mode - turning it on now.")
+            hard = true;
+        }
+
+        // set strategy config store
+        let s = availableStrats.find(s => s.name === strategy.name);
+        if (s !== undefined) {
+            strategyStore.set({s, hard: hard});
         } else {
-            // set strategy config store
-            let s_idx = availableStrats.find(s => s.name === strategy.name)['idx'];
-            if (s_idx !== undefined) {
-                strategyStore.set({
-                    idx: s_idx,
-                    hard: hardmode,
-                });
-            } else {
-                console.error("strategy index not found")
-            }
+            console.error("strategy index not found")
         }
     }
 
@@ -58,7 +57,7 @@
         </Segment>
     </SegmentedButton>
     <FormField>
-        <Switch bind:checked={hardmode} touch/>
+        <Switch bind:checked={hard} touch/>
         <span slot="label">Hard-mode</span>
     </FormField>
 </div>
