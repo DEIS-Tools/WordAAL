@@ -7,11 +7,8 @@
 
 
     let hard = true;
-    let strategy = {
-        name: "combined",
-        desc: "Combined - both conservative and permissive",
-        idx: 1
-    };
+
+
     let availableStrats = [
         {
             name: "combined",
@@ -31,6 +28,8 @@
             location_hard: "PERM_HM_PT.json",
         },
     ]
+
+    let strategy = availableStrats[1];
 
     $: {
         if (strategy.name === "permissive" && !hard) {
