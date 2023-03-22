@@ -27,7 +27,7 @@
     // init: confident placement of letters
     let sure_letters = new Array(NPOS);
 
-    // init: knowledge array (
+    // init: knowledge array
     for (let i = 0; i < NPOS; ++i) {
         knowledge[i] = new Array(NLETTER);
         sure_letters[i] = -1;
@@ -86,16 +86,20 @@
     }
 
     function update_count(guess, response) {
+        // 0 default, -1 surely not, 1 surely
+        console.error(guess, response);
         // response: 0=in-place, 1=present, 2=absent
         let local_counts = new Array(NLETTER);
         // init local counts
-        for (let letter_local = 0; letter_local < NLETTER; ++letter_local)
+        for (let letter_local = 0; letter_local < NLETTER; ++letter_local) //fixme, unneeded - but remove after it works, dummy
             local_counts[letter_local] = 0;
 
         // if response says not absent at position, then increment local count
         for (let position = 0; position < NPOS; ++position)
-            if (response[position] !== 2)
+            if (response[position] != 2) { //fixme: TYPE COERCION!!! problem is that response is a string, not a number
                 local_counts[guess[position]] += 1;
+            }
+
 
         // update global counts
         for (let letter = 0; letter < NLETTER; ++letter)
@@ -185,29 +189,29 @@
                 let letter_sum = 0;
                 let letter = 0;
                 for (let l = 0; l < NLETTER; ++l) {
-                    if (knowledge[p][l] !== -1) {
+                    if (knowledge[p][l] != -1) {
                         letter = l;
                         letter_sum += 1;
                     }
                 }
-                if (letter_sum === 1 && knowledge[p][letter] !== 1) { // new information!
+                if (letter_sum == 1 && knowledge[p][letter] != 1) { // new information!
 
                     knowledge[p][letter] = 1;
                     changed = true;
                     console.log("Got " + p + " " + letter);
                 }
-                if (letter_sum === 1) {
+                if (letter_sum == 1) {
                     --local_counts[letter];
                 }
             }
             let sm = 0;
             for (let l = 0; l < NLETTER; ++l)
                 sm += global_counts[l];
-            if (sm === NPOS) {
+            if (sm == NPOS) {
                 // we can remove all that are not consistent with the 5 known letters
                 for (let p = 0; p < NPOS; ++p) {
                     for (let l = 0; l <= NLETTER; ++l) {
-                        if (knowledge[p][l] !== 1 && global_counts[l] === 0) {
+                        if (knowledge[p][l] != 1 && global_counts[l] == 0) {
 
                             //console.log("Got2 " + p); //console.log("Got2 " + p + " " + letter);
                             knowledge[p][l] = -1;
@@ -321,6 +325,7 @@
         }
 
         update_count(num_guess, response);
+        console.error("global_counts: " + global_counts); //fixme: debug
         update_hints(num_guess, response);
         if (mode) update_hard();
         if (strategy === 0) {
@@ -361,13 +366,18 @@
         } else {
             sv = "(1)";
         }
+        /*
+        (1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0) legacy
+        (1,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0) new
+         */
+
         let cost;
         if (strategyJSON["regressors"][sv] === undefined) {
             cost = Infinity;
         } else {
             cost = lookup(strategyJSON["regressors"][sv]["regressor"][String(wid)]);
         }
-        console.warn("strategy_lookup:wid: " + wid + " (" + convertCharArrayToString(WORDS[wid]) + ") with cost: " + cost);
+        //console.warn("strategy_lookup:wid: " + wid + " (" + convertCharArrayToString(WORDS[wid]) + ") with cost: " + cost);
         return cost;
     }
 
@@ -390,6 +400,18 @@
         for (let wid = 0; wid < NWORDS; ++wid) {
             let word = {wid: wid, word: "", knowledge: [], cost: Infinity};
 
+            // if word is in any responseHistory, then skip
+            for (let i = 0; i < $responseHistoryStore.length; i++) {
+                let guess = $responseHistoryStore[i].map((x) => x[0]).join("");
+                let num_guess = new Array(NPOS);
+                for (let p = 0; p < NPOS; ++p) {
+                    num_guess[p] = guess.charCodeAt(p) - 97;
+                }
+                let wid2 = word_id(num_guess);
+                if (wid2 === wid) {
+                    break;
+                }
+            }
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
                 let vw = "";
 
@@ -447,7 +469,6 @@
         }
 
 
-
         proposalsStore.set(res.sort((a, b) => {
             return a.cost - b.cost;
         }));
@@ -503,7 +524,10 @@
         }
     }
 
-
+    $: {
+        // when knowledge matrix changes, update the knowledge html
+        display_knowledge();
+    }
 
 
 </script>
@@ -511,6 +535,10 @@
 <div class="driver">
     <Button variant="raised" on:click={update_all}>Query strategy</Button>
     <Button variant="raised" on:click={show_words}>Show words</Button>
+
+    <div class="knowledge">
+        {@html knowledge_html}
+    </div>
 </div>
 
 <style>
@@ -520,5 +548,36 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
+    }
+
+    #knowledge {
+        position: absolute;
+        bottom: 0px;
+        width: 884px;
+        margin-left: -442px;
+        left: 50%;
+    }
+
+    .green, .yellow, .gray, .white {
+        height: 30px;
+        width: 30px;
+        border-radius: 3px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid black;
+        margin-right: 2px;
+    }
+
+    .green {
+        background-color: green;
+    }
+
+    .yellow {
+        background-color: yellow;
+    }
+
+    .gray {
+        background-color: grey;
     }
 </style>

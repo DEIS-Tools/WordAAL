@@ -21,6 +21,7 @@
             target[i] = String.fromCharCode(WORDS[index][i] + 97);
         }
         target = target.join('');
+        //target = "raise"; //hardcode target word
         targetWordStore.set({cleartext: target, index: index, chars: WORDS[index]});
     }
 

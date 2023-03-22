@@ -119,6 +119,7 @@
 
 <style>
     .wrapper {
+        display: flex;
         width: 1000px;
         border: 1px solid black;
         border-radius: 10px;
@@ -127,34 +128,16 @@
     }
 
     .left {
-        width: 550px;
+        flex-grow: 1;
         float: left;
         padding: 5px;
         border-radius: 10px;
     }
 
     .right {
+        flex-grow: 1;
         border-radius: 10px;
         padding: 5px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
-    }
-
-    .logo {
-        height: 6em;
-        padding: 1.5em;
-        will-change: filter;
-        transition: filter 300ms;
-    }
-
-    .logo:hover {
-        filter: drop-shadow(0 0 2em #646cffaa);
-    }
-
-    .logo.svelte:hover {
-        filter: drop-shadow(0 0 2em #ff3e00aa);
-    }
-
-    .read-the-docs {
-        color: #888;
     }
 </style>

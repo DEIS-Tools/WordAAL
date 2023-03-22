@@ -4,6 +4,7 @@
         NPOS,
         NWORDS,
         WORDS,
+        MAX_N_GUESSES,
         convertStringToCharArray,
         arraysEqual,
         wordInWordlist
@@ -25,7 +26,7 @@
 
     onMount(() => {
         console.log("onMount game");
-        guessStore.set("cedar");
+        //guessStore.set("cedar");
     });
 
 
@@ -111,7 +112,7 @@
             if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
                 alert("You've won!");
                 resetGame();
-            } else if ($responseHistoryStore.length >= 5) {
+            } else if ($responseHistoryStore.length >= MAX_N_GUESSES) {
                 alert("You've lost!");
                 resetGame();
             }
@@ -127,9 +128,8 @@
     }
 
 </script>
-<Button variant="raised" on:click={checkGuess}>Guess</Button>
-<Textfield variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
-           input$maxlength={NPOS} autofocus/>
 
 
 <ResponseHistory response={$responseStore}/>
+<Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
+           input$maxlength={NPOS} autofocus/>

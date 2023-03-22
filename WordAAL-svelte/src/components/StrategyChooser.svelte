@@ -6,7 +6,7 @@
     import FormField from '@smui/form-field';
 
 
-    let hard = false;
+    let hard = true;
     let strategy = {
         name: "combined",
         desc: "Combined - both conservative and permissive",

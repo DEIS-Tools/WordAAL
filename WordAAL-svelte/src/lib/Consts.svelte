@@ -1,9 +1,11 @@
- <script context="module">
+<script context="module">
     export const NWORDS = 12972;
     export const ASCII_OFFSET = 97;
     export const NLETTER = 26;
     export const NPOS = 5;
+    export const MAX_N_GUESSES = 20; //fixme, for debugging
     export const INDEX_LAST_CURATED_WORD = 2314;
+
     export function convertStringToCharArray(str) {
         const res = new Array(str.length);
         for (let i = 0; i < str.length; i++) {
