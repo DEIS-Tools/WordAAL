@@ -1,6 +1,7 @@
 <script>
-    import {guessStore, guessSubmitTrigger, proposalsStore} from "../stores/stores.js";
+    import {guessStore, guessSubmitTrigger, proposalsStore, strategyStore} from "../stores/stores.js";
     import Key from "./Key.svelte";
+    import {NUM_PROPOSALS} from "../lib/Consts.svelte"
 
     /*
      on proposalsStore change:
@@ -11,20 +12,13 @@
 
     // autosub to proposalsStore
     let proposals = [];
-    export let num_results = 5;
+
     $: {
         let p = $proposalsStore;
-        // check type is array
         if (!Array.isArray(p)) {
             console.log("proposalsStore is not an array, perhaps StrategyDriver has not finished");
         } else {
-            // log word and cost for each
-            p.forEach((proposal) => {
-                //console.log(proposal.word, proposal.cost);
-            });
-            let topN = p.slice(0, num_results);
-            console.log(topN);
-            proposals = topN;
+            proposals = p.slice(0, NUM_PROPOSALS);
         }
     }
 
@@ -40,10 +34,10 @@
 {#each proposals as proposal}
     <div class="proposals-box">
         <div class="proposal" on:click={() => propose(proposal.word)}>
-            {#each proposal.word as letter}
-                <Key value={letter} state={2}/>
+            {#each proposal.word as letter, letterIndex}
+                <Key value={letter} state={proposal.knowledge[letterIndex]}/>
             {/each}
-            <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(2)}</div>
+            <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(3)}</div>
 
         </div>
     </div>

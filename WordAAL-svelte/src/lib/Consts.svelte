@@ -4,6 +4,7 @@
     export const NLETTER = 26;
     export const NPOS = 5;
     export const MAX_N_GUESSES = 20; //fixme, for debugging
+    export const NUM_PROPOSALS = 5;
     export const INDEX_LAST_CURATED_WORD = 2314;
 
     export function convertStringToCharArray(str) {

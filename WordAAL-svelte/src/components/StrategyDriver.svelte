@@ -44,7 +44,6 @@
 
     function parseStrategyConfigEvent(store) {
         mode = store['hard'];
-        console.log("driver: mode is " + mode);
         if (mode) {
             staticPath += store.s.location_hard;
         } else {
@@ -96,7 +95,7 @@
 
         // if response says not absent at position, then increment local count
         for (let position = 0; position < NPOS; ++position)
-            if (response[position] != 2) { //fixme: TYPE COERCION!!! problem is that response is a string, not a number
+            if (response[position] != 2) { //TYPE COERCION!!! response is a string, not a number
                 local_counts[guess[position]] += 1;
             }
 
@@ -109,8 +108,9 @@
     function update_hints(guess, response) {
         // given a guess and response, update all sure letters
         for (let p = 0; p < NPOS; ++p)
-            if (response[p] === 0)
+            if (response[p] == 0)
                 sure_letters[p] = guess[p];
+
     }
 
     function update_hard() {
@@ -124,8 +124,8 @@
 
                 // for each word position
                 for (let p = 0; p < NPOS; ++p) {
-                    // if we have a hint at this position for word w and word w position is not the same as the hint
-                    if (sure_letters[p] !== -1 && WORDS[w][p] !== sure_letters[p]) {
+                    // if we have a hint at this position for word w, and word w position is not the same as the hint
+                    if (sure_letters[p] != -1 && WORDS[w][p] != sure_letters[p]) {
                         hard[w] = false; // we did not use the position-hints!
                     }
                     // todo, why??
@@ -141,21 +141,22 @@
     }
 
     function update_conservative(response, guess) {
+        console.error("update_conservative knowledge pre: ", knowledge);
         for (let pos = 0; pos < NPOS; ++pos) {
             let currGuessLetter = guess[pos];
-            if (response[pos] === 0) { // letter p in guess is correctly placed
+            if (response[pos] == 0) { // letter p in guess is correctly placed
                 // set all letters to SURELY-NOT in this position
                 for (let l = 0; l < NLETTER; ++l)
                     knowledge[pos][l] = Response.SURELY_NOT;
                 // mark the guess-letter as SURELY present in this position
                 knowledge[pos][currGuessLetter] = Response.SURELY;
 
-            } else if (response[pos] === 1) { // incorrectly placed
+            } else if (response[pos] == 1) { // incorrectly placed
                 // mark this letter SURELY-NOT in this position in this position
                 knowledge[pos][currGuessLetter] = Response.SURELY_NOT;
 
-            } else if (response[pos] === 2) { // does not appear at all
-                if (global_counts[currGuessLetter] === 0) {
+            } else if (response[pos] == 2) { // does not appear at all
+                if (global_counts[currGuessLetter] == 0) {
                     for (let q = 0; q < NPOS; ++q)
                         // mark this letter absent in all positions in knowledge
                         knowledge[q][currGuessLetter] = Response.SURELY_NOT;
@@ -163,18 +164,19 @@
                     knowledge[pos][currGuessLetter] = Response.SURELY_NOT;
                     let all_ok = true;
                     for (let q = 0; q < NPOS; ++q) {
-                        all_ok &= (guess[q] !== currGuessLetter || response[q] !== 1);
+                        all_ok &= (guess[q] != currGuessLetter || response[q] !== 1);
                         if (!all_ok) break;
                     }
                     if (all_ok) {
                         // all are correctly placed i.e not MAYBE
                         for (let q = 0; q < NPOS; ++q)
-                            if (guess[q] !== currGuessLetter || response[q] !== 0)
+                            if (guess[q] != currGuessLetter || response[q] != 0)
                                 knowledge[q][currGuessLetter] = -1;
                     }
                 }
             }
         }
+        console.error("update_conservative knowledge post: ", knowledge);
     }
 
 
@@ -325,8 +327,10 @@
         }
 
         update_count(num_guess, response);
-        console.error("global_counts: " + global_counts); //fixme: debug
+        console.error("global_counts: ", global_counts); //fixme: debug, remove
         update_hints(num_guess, response);
+        console.error("sure_letters: ", sure_letters); //fixme: debug, remove
+
         if (mode) update_hard();
         if (strategy === 0) {
             update_conservative(response, num_guess);
@@ -341,7 +345,7 @@
     function lookup(regressor) {
         if (typeof (regressor) === 'object') {
             let pv = strategyJSON["pointvars"][regressor["var"]].substring(5);
-            let val = eval(pv);
+            let val = eval(pv); //fixme: jank lookup, might be similar to strategy_lookup fix
             let k = regressor["var"];
             if (val <= regressor["bound"])
                 return lookup(regressor["low"]);
@@ -366,10 +370,6 @@
         } else {
             sv = "(1)";
         }
-        /*
-        (1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0) legacy
-        (1,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0) new
-         */
 
         let cost;
         if (strategyJSON["regressors"][sv] === undefined) {
@@ -398,7 +398,7 @@
         let best = best_action();
         let res = [];
         for (let wid = 0; wid < NWORDS; ++wid) {
-            let word = {wid: wid, word: "", knowledge: [], cost: Infinity};
+            let word = {wid: wid, word: "", knowledge: [2,2,2,2,2], cost: Infinity};
 
             // if word is in any responseHistory, then skip
             for (let i = 0; i < $responseHistoryStore.length; i++) {
@@ -413,26 +413,20 @@
                 }
             }
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
-                let vw = "";
-
-                let bold = (wid < 2315);
-
-
                 for (let p = 0; p < NPOS; ++p) {
                     let char = String.fromCharCode(97 + WORDS[wid][p]);
 
-                    let color = "white";
-                    if (knowledge[p][WORDS[wid][p]] === -1)
-                        color = "gray";
-                    else if (knowledge[p][WORDS[wid][p]] === 1)
-                        color = "green";
-                    // push status
-                    word["knowledge"].push(knowledge[p][WORDS[wid][p]])
+                    // if counts for current letter is positive, mark knowledge as 1
+                    if (global_counts[WORDS[wid][p]] > 0) {
+                        word["knowledge"][p] = 1;
+                    }
+                    // if sure about current letter being correct, mark it as 0
+                    if (sure_letters[p] === WORDS[wid][p]) {
+                        word["knowledge"][p] = 0;
+                    }
+
                     word["word"] += char;
-                    //vw += "<span class=" + color + ">" + char + "</span>";
-                    //word += char
                 }
-                //let btn = "<button class='word' onclick='fill_answer(\"" + word + "\")'>" + vw;
 
 
                 // if best action is not infinity, then we are in strategy mode??
@@ -443,9 +437,7 @@
                         //alert("error at wid: " + wid + " with no cost from strat: " + cst);
                         continue;
                     }
-                    //console.log("wid: " + wid, " cst: " + cst)
                     word['cost'] = cst;
-                    //btn += "(" + cst.toFixed(3) + ")";
                 }
                 /*
                 btn += "</button>";
@@ -476,44 +468,35 @@
 
     //fixme: port knowledge to svelte component
     function display_knowledge() {
-        let knhtml = "";
+        let knhtml = "<table class='knowledge'>";
         for (let p = 0; p < NPOS; ++p) {
-            if (p !== 0) knhtml += "<br/>";
             if (p === 0) {
+                knhtml += "<tr>";
                 for (let l = 0; l < NLETTER; ++l)
-                    knhtml += "<span class='yellow'>" + global_counts[l] + "</span>";
-                knhtml += "<br/>";
+                    knhtml += "<th>" + global_counts[l] + "</th>";
+                knhtml += "</tr>";
             }
+                knhtml += "<tr>";
             for (let l = 0; l < NLETTER; ++l) {
+                knhtml += "<td>";
                 const k = knowledge[p][l];
-                knhtml += "<span class='";
-                if (k === -1) {
-                    knhtml += "gray";
-                } else if (k === 1) {
-                    knhtml += "green";
-                } else {
-                    knhtml += "white";
+                if (k == Response.SURELY_NOT) {
+                    knhtml += "<i>";
+                } else if (k == Response.SURELY) {
+                    knhtml += "<b>";
                 }
-                knhtml += "'>" + String.fromCharCode(97 + l) + "</span>";
+                knhtml += String.fromCharCode(97 + l);
+                if (k == Response.SURELY_NOT) {
+                    knhtml += "</i>";
+                } else if (k == Response.SURELY) {
+                    knhtml += "</b>";
+                }
+                knhtml += "</td>";
             }
+                knhtml += "</tr>";
         }
+        knhtml += "</table>";
         knowledge_html = knhtml;
-    }
-
-    // generate history of guesses and their accuracy per letter in guess
-    // todo: refactor to message Response History
-    function response_to_html(guess, response) {
-        let res = "";
-        for (let p = 0; p < NPOS; ++p) {
-            if (response[p] === 2) {
-                res += "<span class='gray'>" + String(guess[p]) + "</span>"
-            } else if (response[p] === 1) {
-                res += "<span class='yellow'>" + String(guess[p]) + "</span>"
-            } else {
-                res += "<span class='green'>" + String(guess[p]) + "</span>"
-            }
-        }
-        return "<div class=element >" + res + "</div>";
     }
 
     // when responsehistory changes, take the last element and update_all()
@@ -526,6 +509,7 @@
 
     $: {
         // when knowledge matrix changes, update the knowledge html
+        console.log("knowledge updated: ", knowledge);
         display_knowledge();
     }
 
@@ -550,34 +534,15 @@
         width: 100%;
     }
 
-    #knowledge {
-        position: absolute;
-        bottom: 0px;
-        width: 884px;
-        margin-left: -442px;
-        left: 50%;
-    }
-
-    .green, .yellow, .gray, .white {
-        height: 30px;
-        width: 30px;
-        border-radius: 3px;
-        display: inline-block;
-        text-align: center;
-        vertical-align: middle;
-        border: 1px solid black;
-        margin-right: 2px;
-    }
-
     .green {
-        background-color: green;
+        color: green;
     }
 
     .yellow {
-        background-color: yellow;
+        color: yellow;
     }
 
     .gray {
-        background-color: grey;
+        color: grey;
     }
 </style>

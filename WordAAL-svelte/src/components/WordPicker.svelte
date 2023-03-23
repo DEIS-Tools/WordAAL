@@ -1,5 +1,5 @@
 <script type="module">
-    import {WORDS, INDEX_LAST_CURATED_WORD, NPOS} from '../lib/Consts.svelte';
+    import {WORDS, INDEX_LAST_CURATED_WORD, NPOS, convertStringToCharArray} from '../lib/Consts.svelte';
 
     import {newGameTrigger, targetWordStore} from "../stores/stores.js";
     import {onMount} from "svelte";
@@ -13,7 +13,7 @@
     function randomTargetWord() {
         let onlyCurated = true;
 
-        const index = Math.floor(Math.random() * (onlyCurated ? INDEX_LAST_CURATED_WORD : WORDS.length));
+        let index = Math.floor(Math.random() * (onlyCurated ? INDEX_LAST_CURATED_WORD : WORDS.length));
 
         // clone WORDS[index] to target
         let target = JSON.parse(JSON.stringify(WORDS[index]));
@@ -21,8 +21,15 @@
             target[i] = String.fromCharCode(WORDS[index][i] + 97);
         }
         target = target.join('');
-        //target = "raise"; //hardcode target word
-        targetWordStore.set({cleartext: target, index: index, chars: WORDS[index]});
+        let chars = WORDS[index];
+
+        // DEBUG
+        target = "abuse"; //hardcode target word
+        chars = convertStringToCharArray(target)
+        index = 12;
+        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
+
+        targetWordStore.set({cleartext: target, index: index, chars: chars});
     }
 
     //fixme: rewrite to update store statement
