@@ -24,9 +24,9 @@
         let chars = WORDS[index];
 
         // DEBUG
-        target = "abuse"; //hardcode target word
+        target = "meter"; //hardcode target word
         chars = convertStringToCharArray(target)
-        index = 12;
+        index = 1225;
         console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
 
         targetWordStore.set({cleartext: target, index: index, chars: chars});

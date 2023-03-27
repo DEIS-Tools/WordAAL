@@ -1,19 +1,11 @@
 <script>
     import {responseHistoryStore} from '../stores/stores.js';
-    import {convertStringToCharArray} from '../lib/Consts.svelte';
     import Key from "./Key.svelte";
 
-   /* export function wordInResponseHistory(word) { //fixme: ambiguous import - perhaps cyclical dependency
-        const wordArray = convertStringToCharArray(word);
-        for (let i = 0; i < $responseHistoryStore.length; i++) {
-            if (arraysEqual($responseHistoryStore[i], wordArray)) {
-                return true;
-            }
-        }
-        return false;
-    }*/
 </script>
-
+<div class="history">
+    <h3>History: </h3><br>
+</div>
 <div class="history">
     <table>
         <tr>

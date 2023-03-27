@@ -1,6 +1,6 @@
 <script>
 
-    import {NLETTER, NPOS, NWORDS, WORDS, convertCharArrayToString} from "../lib/Consts.svelte";
+    import {NLETTER, NPOS, NWORDS, WORDS, convertStringToCharArray, convertCharArrayToString} from "../lib/Consts.svelte";
     import {guessStore, proposalsStore, responseHistoryStore, strategyStore} from "../stores/stores.js";
     import Button from "@smui/button";
 
@@ -12,34 +12,25 @@
 
     let knowledge_html;
 
-    let hard = new Array(NWORDS); // used for caching hardmode words
-
     const Response = {
         SURELY_NOT: -1,
         MAYBE: 0,
         SURELY: 1
     }
 
-    let knowledge = new Array(NPOS);
+    // used for caching hardmode words
+    let hard = new Array(NWORDS).fill(true);
+
     // counts of maximal number of occurences for each letter observed in a single word
-    let global_counts = new Array(NLETTER);
+    let global_counts = new Array(NLETTER).fill(0);
 
     // init: confident placement of letters
-    let sure_letters = new Array(NPOS);
+    let sure_letters = new Array(NPOS).fill(-1);
 
     // init: knowledge array
+    let knowledge = new Array(NPOS);
     for (let i = 0; i < NPOS; ++i) {
-        knowledge[i] = new Array(NLETTER);
-        sure_letters[i] = -1;
-        for (let l = 0; l < NLETTER; ++l)
-            knowledge[i][l] = 0;
-    }
-    for (let l = 0; l < NLETTER; ++l) {
-        global_counts[l] = 0;
-    }
-
-    for (let w = 0; w < NWORDS; ++w) {
-        hard[w] = true;
+        knowledge[i] = new Array(NLETTER).fill(0);
     }
 
     function parseStrategyConfigEvent(store) {
@@ -51,6 +42,7 @@
         }
 
         loadStrategoStrategyJSON(staticPath);
+        // reset path for reload of another strategy
         staticPath = "static/strategies/";
 
         // map strat to legacy; comb=2 || cons=0 || perm=1
@@ -85,32 +77,27 @@
     }
 
     function update_count(guess, response) {
-        // 0 default, -1 surely not, 1 surely
-        console.error(guess, response);
-        // response: 0=in-place, 1=present, 2=absent
-        let local_counts = new Array(NLETTER);
-        // init local counts
-        for (let letter_local = 0; letter_local < NLETTER; ++letter_local) //fixme, unneeded - but remove after it works, dummy
-            local_counts[letter_local] = 0;
+        // init zeroed local counts
+        let local_counts = new Array(NLETTER).fill(0);
 
-        // if response says not absent at position, then increment local count
+        // if response not absent at position, then increment local count
         for (let position = 0; position < NPOS; ++position)
             if (response[position] != 2) { //TYPE COERCION!!! response is a string, not a number
                 local_counts[guess[position]] += 1;
             }
 
-
         // update global counts
-        for (let letter = 0; letter < NLETTER; ++letter)
+        for (let letter = 0; letter < NLETTER; ++letter) {
             global_counts[letter] = Math.max(global_counts[letter], local_counts[letter]);
+        }
     }
 
     function update_hints(guess, response) {
         // given a guess and response, update all sure letters
         for (let p = 0; p < NPOS; ++p)
-            if (response[p] == 0)
+            if (response[p] == 0) {
                 sure_letters[p] = guess[p];
-
+            }
     }
 
     function update_hard() {
@@ -141,7 +128,6 @@
     }
 
     function update_conservative(response, guess) {
-        console.error("update_conservative knowledge pre: ", knowledge);
         for (let pos = 0; pos < NPOS; ++pos) {
             let currGuessLetter = guess[pos];
             if (response[pos] == 0) { // letter p in guess is correctly placed
@@ -176,11 +162,10 @@
                 }
             }
         }
-        console.error("update_conservative knowledge post: ", knowledge);
     }
 
 
-    function check_sums(response) { //fixme; arg not used?
+    function check_sums() {
         let local_counts = new Array(NLETTER);
         for (let changed = true; changed; /*nothing*/ changed) {
             changed = false;
@@ -200,7 +185,6 @@
 
                     knowledge[p][letter] = 1;
                     changed = true;
-                    console.log("Got " + p + " " + letter);
                 }
                 if (letter_sum == 1) {
                     --local_counts[letter];
@@ -214,8 +198,6 @@
                 for (let p = 0; p < NPOS; ++p) {
                     for (let l = 0; l <= NLETTER; ++l) {
                         if (knowledge[p][l] != 1 && global_counts[l] == 0) {
-
-                            //console.log("Got2 " + p); //console.log("Got2 " + p + " " + letter);
                             knowledge[p][l] = -1;
                         }
                     }
@@ -279,16 +261,14 @@
     function update_all() {
 
         if ($responseHistoryStore.length === 0) {
-            alert("No response history");
+            console.error("driver: no response history - cannot update")
             return;
         }
         let last = $responseHistoryStore[$responseHistoryStore.length - 1];
         let guess = last.map((x) => x[0]).join("");
         let response = last.map((x) => x[1]).join("");
-        console.log("update all, guess=" + guess + " response=" + response);
 
         if (response.length !== NPOS) {
-            console.log(response)
             alert("Need 5 characters in response");
             return;
         }
@@ -327,9 +307,7 @@
         }
 
         update_count(num_guess, response);
-        console.error("global_counts: ", global_counts); //fixme: debug, remove
         update_hints(num_guess, response);
-        console.error("sure_letters: ", sure_letters); //fixme: debug, remove
 
         if (mode) update_hard();
         if (strategy === 0) {
@@ -371,14 +349,11 @@
             sv = "(1)";
         }
 
-        let cost;
         if (strategyJSON["regressors"][sv] === undefined) {
-            cost = Infinity;
+            return Infinity;
         } else {
-            cost = lookup(strategyJSON["regressors"][sv]["regressor"][String(wid)]);
+            return lookup(strategyJSON["regressors"][sv]["regressor"][String(wid)]);
         }
-        //console.warn("strategy_lookup:wid: " + wid + " (" + convertCharArrayToString(WORDS[wid]) + ") with cost: " + cost);
-        return cost;
     }
 
     function best_action() {
@@ -393,22 +368,17 @@
     }
 
     function show_words() {
-        let proposals = "";
 
         let best = best_action();
         let res = [];
         for (let wid = 0; wid < NWORDS; ++wid) {
-            let word = {wid: wid, word: "", knowledge: [2,2,2,2,2], cost: Infinity};
+            let word = {wid: wid, word: "", knowledge: [2, 2, 2, 2, 2], cost: Infinity};
 
             // if word is in any responseHistory, then skip
             for (let i = 0; i < $responseHistoryStore.length; i++) {
                 let guess = $responseHistoryStore[i].map((x) => x[0]).join("");
-                let num_guess = new Array(NPOS);
-                for (let p = 0; p < NPOS; ++p) {
-                    num_guess[p] = guess.charCodeAt(p) - 97;
-                }
-                let wid2 = word_id(num_guess);
-                if (wid2 === wid) {
+                let num_guess = convertStringToCharArray(guess);
+                if (word_id(num_guess) === wid) {
                     break;
                 }
             }
@@ -416,9 +386,19 @@
                 for (let p = 0; p < NPOS; ++p) {
                     let char = String.fromCharCode(97 + WORDS[wid][p]);
 
-                    // if counts for current letter is positive, mark knowledge as 1
+                    // if counts for current letter is positive and is not known sure letter, mark knowledge as 1
                     if (global_counts[WORDS[wid][p]] > 0) {
-                        word["knowledge"][p] = 1;
+                        let already_correct = false;
+
+                        for (let i = 0; i < NPOS; i++) {
+                            if (sure_letters[i] != WORDS[wid][p]) {
+                                already_correct = true;
+                            }
+                        }
+
+                        if (already_correct) {
+                            word["knowledge"][p] = 1;
+                        }
                     }
                     // if sure about current letter being correct, mark it as 0
                     if (sure_letters[p] === WORDS[wid][p]) {
@@ -466,8 +446,8 @@
         }));
     }
 
-    //fixme: port knowledge to svelte component
     function display_knowledge() {
+        // fixme: port to svelte component if requirement arises
         let knhtml = "<table class='knowledge'>";
         for (let p = 0; p < NPOS; ++p) {
             if (p === 0) {
@@ -476,7 +456,7 @@
                     knhtml += "<th>" + global_counts[l] + "</th>";
                 knhtml += "</tr>";
             }
-                knhtml += "<tr>";
+            knhtml += "<tr>";
             for (let l = 0; l < NLETTER; ++l) {
                 knhtml += "<td>";
                 const k = knowledge[p][l];
@@ -493,7 +473,7 @@
                 }
                 knhtml += "</td>";
             }
-                knhtml += "</tr>";
+            knhtml += "</tr>";
         }
         knhtml += "</table>";
         knowledge_html = knhtml;
@@ -502,28 +482,17 @@
     // when responsehistory changes, take the last element and update_all()
     $: {
         if ($responseHistoryStore.length > 0) {
-            console.log("responseHistoryStore changed: " + $responseHistoryStore[$responseHistoryStore.length - 1]);
             update_all();
         }
-    }
-
-    $: {
-        // when knowledge matrix changes, update the knowledge html
-        console.log("knowledge updated: ", knowledge);
-        display_knowledge();
     }
 
 
 </script>
 
-<div class="driver">
+<!--<div class="driver">
     <Button variant="raised" on:click={update_all}>Query strategy</Button>
     <Button variant="raised" on:click={show_words}>Show words</Button>
-
-    <div class="knowledge">
-        {@html knowledge_html}
-    </div>
-</div>
+</div>-->
 
 <style>
     .driver {
@@ -532,17 +501,5 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
-    }
-
-    .green {
-        color: green;
-    }
-
-    .yellow {
-        color: yellow;
-    }
-
-    .gray {
-        color: grey;
     }
 </style>

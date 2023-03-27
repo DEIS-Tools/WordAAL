@@ -1,16 +1,8 @@
 <script>
-    import {guessStore, guessSubmitTrigger, proposalsStore, strategyStore} from "../stores/stores.js";
+    import {guessStore, guessSubmitTrigger, newGameTrigger, proposalsStore} from "../stores/stores.js";
     import Key from "./Key.svelte";
     import {NUM_PROPOSALS} from "../lib/Consts.svelte"
 
-    /*
-     on proposalsStore change:
-        - generate rows of Key-component words for each proposal
-        - on click, generate event for StrategyDriver
-     */
-
-
-    // autosub to proposalsStore
     let proposals = [];
 
     $: {
@@ -18,24 +10,34 @@
         if (!Array.isArray(p)) {
             console.log("proposalsStore is not an array, perhaps StrategyDriver has not finished");
         } else {
+            // filter off all proposals with cost === Infinity
+            p = p.filter(proposal => proposal.cost !== Infinity);
             proposals = p.slice(0, NUM_PROPOSALS);
         }
     }
 
     function propose(guess) {
-        console.log("proposal chosen: " + guess);
+        console.log("propose word: " + guess);
         guessStore.set(guess);
         guessSubmitTrigger.set(true);
     }
 
-</script>
+    $: {
+        // when new game is triggered, clear the proposals
+        if ($newGameTrigger) {
+            proposals = [];
+        }
+    }
 
-<!--For each proposal, render them as five keys with state=2. Linebreak s.t. subsequent proposals are placed below the previous -->
+</script>
+<div class="proposals-box">
+    <h3>Proposals:</h3>
+</div>
 {#each proposals as proposal}
     <div class="proposals-box">
         <div class="proposal" on:click={() => propose(proposal.word)}>
             {#each proposal.word as letter, letterIndex}
-                <Key value={letter} state={proposal.knowledge[letterIndex]}/>
+                <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
             {/each}
             <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(3)}</div>
 
@@ -45,14 +47,6 @@
 
 
 <style>
-
-    #divider {
-        width: 350px;
-        border-bottom: black 1px solid;
-        display: flex;
-    }
-
-    /* proposal should be left-adjusted and not stretched */
     .proposal {
         display: flex;
         flex-direction: row;

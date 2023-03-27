@@ -1,15 +1,9 @@
 <script>
     import {
-        NLETTER,
         NPOS,
-        NWORDS,
-        WORDS,
         MAX_N_GUESSES,
-        convertStringToCharArray,
-        arraysEqual,
         wordInWordlist
     } from "../lib/Consts.svelte";
-    import StrategyDriver from "./StrategyDriver.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
     import {
         guessStore,
@@ -19,7 +13,6 @@
         newGameTrigger,
         guessSubmitTrigger,
     } from "../stores/stores.js";
-    import Button from '@smui/button';
 
     import {onMount} from "svelte";
     import Textfield from "@smui/textfield";
@@ -130,6 +123,6 @@
 </script>
 
 
-<ResponseHistory response={$responseStore}/>
+<ResponseHistory/>
 <Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
            input$maxlength={NPOS} autofocus/>

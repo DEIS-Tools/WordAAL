@@ -4,7 +4,7 @@ Interactive Wordle-like demo showcasing the resulting strategies from the paper 
 ## Todo (in order of priority)
 - [x] Get basic Wordle game working
 - [x] Integrate keyboard guess input
-- [ ] Get strategy-driver working; user needs to be able to pick top N best words given the current knowledge for each strategy.
+- [x] Get strategy-driver working; user needs to be able to pick top N best words given the current knowledge for each strategy.
 - [ ] Versus mode: Human plays concurrently against chosen strategy, only revealing strategy-move after human move.
 - [ ] Polish UI and UX
 - [ ] Migrate alerts to toasts

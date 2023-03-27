@@ -91,7 +91,7 @@
 
         </div>
         <div class="right">
-            <StrategyDriver target={$targetWordStore['cleartext']} guess="cedar"/>
+            <StrategyDriver/>
 
             <ProposalChooser/>
 
