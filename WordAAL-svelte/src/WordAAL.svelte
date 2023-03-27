@@ -76,7 +76,7 @@
 </script>
 
 <main>
-    <div class="card">
+    <div>
         {#each wordaalLogo as k}
             <Key {...k} clickable="true"/>
         {/each}
@@ -99,7 +99,7 @@
     </div>
 
 
-    <div class="card">
+    <div>
         <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
     </div>
 
@@ -120,23 +120,20 @@
 <style>
     .wrapper {
         display: flex;
-        width: 1000px;
-        border: 1px solid black;
+
+        border: 1px solid grey;
         border-radius: 10px;
-        padding: 5px;
+        padding: 32px 16px;
         overflow: hidden; /* will contain if #first is longer than #second */
     }
 
     .left {
-        flex-grow: 1;
-        float: left;
+        flex-grow: 2;
         padding: 5px;
-        border-radius: 10px;
     }
 
     .right {
         flex-grow: 1;
-        border-radius: 10px;
         padding: 5px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
     }

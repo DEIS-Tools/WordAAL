@@ -4,9 +4,6 @@
 
 </script>
 <div class="history">
-    <h3>History: </h3><br>
-</div>
-<div class="history">
     <table>
         <tr>
             {#if ($responseHistoryStore !== undefined && $responseHistoryStore.length > 0)}
@@ -22,6 +19,9 @@
                     {/each}
                 {/if}
             {/if}
+            &nbsp;&nbsp;
+            <Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/>
+            <br/>
         </tr>
     </table>
 </div>
@@ -46,8 +46,7 @@
     /* align proposals-box to right*/
     .history {
         display: flex;
-        flex-direction: row;
-        float: inside;
+        justify-content: flex-end;
         padding: 5px;
         margin: 5px;
     }

@@ -30,9 +30,6 @@
     }
 
 </script>
-<div class="proposals-box">
-    <h3>Proposals:</h3>
-</div>
 {#each proposals as proposal}
     <div class="proposals-box">
         <div class="proposal" on:click={() => propose(proposal.word)}>
@@ -60,10 +57,9 @@
         background-color: rgba(150, 238, 150, 0.81);
     }
 
-    /* align proposals-box to right*/
     .proposals-box {
         display: flex;
         flex-direction: row;
-        float: inside;
+        justify-content: flex-end;
     }
 </style>

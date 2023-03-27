@@ -16,6 +16,9 @@
 
     import {onMount} from "svelte";
     import Textfield from "@smui/textfield";
+    import Key from "./Key.svelte";
+
+    let placeholder = new Array(NPOS).fill(0);
 
     onMount(() => {
         console.log("onMount game");
@@ -124,5 +127,16 @@
 
 
 <ResponseHistory/>
-<Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
-           input$maxlength={NPOS} autofocus/>
+<!--<Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
+           input$maxlength={NPOS} autofocus/>-->
+
+
+<style>
+    .box {
+        display: flex;
+        flex-direction: row;
+        float: inside;
+        padding: 5px;
+        margin: 5px;
+    }
+</style>
