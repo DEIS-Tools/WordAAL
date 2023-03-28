@@ -87,14 +87,10 @@
     <div class="wrapper">
         <div class="left">
             <Game target="{$targetWordStore}"/>
-
-
         </div>
         <div class="right">
-            <StrategyDriver/>
-
             <ProposalChooser/>
-
+            <StrategyDriver/>
         </div>
     </div>
 

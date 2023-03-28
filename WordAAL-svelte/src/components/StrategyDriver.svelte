@@ -1,6 +1,12 @@
 <script>
 
-    import {NLETTER, NPOS, NWORDS, WORDS, convertStringToCharArray, convertCharArrayToString} from "../lib/Consts.svelte";
+    import {
+        NLETTER,
+        NPOS,
+        NWORDS,
+        WORDS,
+        convertStringToCharArray,
+    } from "../lib/Consts.svelte";
     import {guessStore, proposalsStore, responseHistoryStore, strategyStore} from "../stores/stores.js";
     import Button from "@smui/button";
 
@@ -21,11 +27,11 @@
     // used for caching hardmode words
     let hard = new Array(NWORDS).fill(true);
 
-    // counts of maximal number of occurences for each letter observed in a single word
-    let global_counts = new Array(NLETTER).fill(0);
+    // counts of maximal number of occurrences for each letter observed in a single word
+    let globalCounts = new Array(NLETTER).fill(0);
 
     // init: confident placement of letters
-    let sure_letters = new Array(NPOS).fill(-1);
+    let sureLetters = new Array(NPOS).fill(-1);
 
     // init: knowledge array
     let knowledge = new Array(NPOS);
@@ -70,13 +76,13 @@
                 // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
                 strategyJSON = JSON.parse(xobj.responseText);
                 console.log("driver: loaded strategy from " + path);
-                show_words();
+                showWords();
             }
         };
         xobj.send(null);
     }
 
-    function update_count(guess, response) {
+    function updateCount(guess, response) {
         // init zeroed local counts
         let local_counts = new Array(NLETTER).fill(0);
 
@@ -88,46 +94,46 @@
 
         // update global counts
         for (let letter = 0; letter < NLETTER; ++letter) {
-            global_counts[letter] = Math.max(global_counts[letter], local_counts[letter]);
+            globalCounts[letter] = Math.max(globalCounts[letter], local_counts[letter]);
         }
     }
 
-    function update_hints(guess, response) {
+    function updateHints(guess, response) {
         // given a guess and response, update all sure letters
         for (let p = 0; p < NPOS; ++p)
             if (response[p] == 0) {
-                sure_letters[p] = guess[p];
+                sureLetters[p] = guess[p];
             }
     }
 
-    function update_hard() {
-        let local_counts = new Array(NLETTER);
+    function updateHard() {
+        let localCounts = new Array(NLETTER);
         for (let w = 0; w < NWORDS; ++w) {
             if (hard[w]) { //fixme, simplify by only checking hard words?
 
                 // copy global counts
                 for (let letter = 0; letter < NLETTER; ++letter)
-                    local_counts[letter] = global_counts[letter];
+                    localCounts[letter] = globalCounts[letter];
 
                 // for each word position
                 for (let p = 0; p < NPOS; ++p) {
                     // if we have a hint at this position for word w, and word w position is not the same as the hint
-                    if (sure_letters[p] != -1 && WORDS[w][p] != sure_letters[p]) {
+                    if (sureLetters[p] != -1 && WORDS[w][p] != sureLetters[p]) {
                         hard[w] = false; // we did not use the position-hints!
                     }
                     // todo, why??
-                    --local_counts[WORDS[w][p]];
+                    --localCounts[WORDS[w][p]];
                 }
 
                 for (let l = 0; l < NLETTER; ++l) {
-                    if (local_counts[l] > 0)
+                    if (localCounts[l] > 0)
                         hard[w] = false; // we did not use all the hints!
                 }
             }
         }
     }
 
-    function update_conservative(response, guess) {
+    function updateConservative(response, guess) {
         for (let pos = 0; pos < NPOS; ++pos) {
             let currGuessLetter = guess[pos];
             if (response[pos] == 0) { // letter p in guess is correctly placed
@@ -142,7 +148,7 @@
                 knowledge[pos][currGuessLetter] = Response.SURELY_NOT;
 
             } else if (response[pos] == 2) { // does not appear at all
-                if (global_counts[currGuessLetter] == 0) {
+                if (globalCounts[currGuessLetter] == 0) {
                     for (let q = 0; q < NPOS; ++q)
                         // mark this letter absent in all positions in knowledge
                         knowledge[q][currGuessLetter] = Response.SURELY_NOT;
@@ -165,12 +171,12 @@
     }
 
 
-    function check_sums() {
-        let local_counts = new Array(NLETTER);
+    function checkSums() {
+        let localCounts = new Array(NLETTER);
         for (let changed = true; changed; /*nothing*/ changed) {
             changed = false;
             for (let l = 0; l < NLETTER; ++l)
-                local_counts[l] = global_counts[l];
+                localCounts[l] = globalCounts[l];
             // check if there is only one unknown letter left
             for (let p = 0; p < NPOS; ++p) {
                 let letter_sum = 0;
@@ -187,17 +193,17 @@
                     changed = true;
                 }
                 if (letter_sum == 1) {
-                    --local_counts[letter];
+                    --localCounts[letter];
                 }
             }
             let sm = 0;
             for (let l = 0; l < NLETTER; ++l)
-                sm += global_counts[l];
+                sm += globalCounts[l];
             if (sm == NPOS) {
                 // we can remove all that are not consistent with the 5 known letters
                 for (let p = 0; p < NPOS; ++p) {
                     for (let l = 0; l <= NLETTER; ++l) {
-                        if (knowledge[p][l] != 1 && global_counts[l] == 0) {
+                        if (knowledge[p][l] != 1 && globalCounts[l] == 0) {
                             knowledge[p][l] = -1;
                         }
                     }
@@ -207,12 +213,12 @@
     }
 
 
-    function update_permissive(response, guess) {
-        update_conservative(response, guess);
-        check_sums(response);
+    function updatePermissive(response, guess) {
+        updateConservative(response, guess);
+        checkSums(response);
     }
 
-    function word_id(guess) {
+    function wordWid(guess) {
         for (let w = 0; w < NWORDS; ++w) {
             let ok = true;
             for (let p = 0; p < NPOS; ++p) {
@@ -250,15 +256,7 @@
         return null;
     }
 
-    function update_all_e(e) {
-        // if enter is pressed
-        if (e.keyCode === 13) {
-            e.preventDefault();
-            update_all();
-        }
-    }
-
-    function update_all() {
+    function updateAal() {
 
         if ($responseHistoryStore.length === 0) {
             console.error("driver: no response history - cannot update")
@@ -288,7 +286,7 @@
 
 
         // lookup word in wordlist
-        let wid = word_id(num_guess);
+        let wid = wordWid(num_guess);
         if (wid === null) {
             alert("Word is not in word-list '" + $guessStore + "'");
             return;
@@ -306,18 +304,18 @@
             return;
         }
 
-        update_count(num_guess, response);
-        update_hints(num_guess, response);
+        updateCount(num_guess, response);
+        updateHints(num_guess, response);
 
-        if (mode) update_hard();
+        if (mode) updateHard();
         if (strategy === 0) {
-            update_conservative(response, num_guess);
+            updateConservative(response, num_guess);
         }
         if (strategy === 1 || strategy === 2) {
-            update_permissive(response, num_guess);
+            updatePermissive(response, num_guess);
         }
-        display_knowledge();
-        show_words();
+        displayKnowledge();
+        showWords();
     }
 
     function lookup(regressor) {
@@ -334,7 +332,7 @@
         }
     }
 
-    function strategy_lookup(wid) {
+    function strategyLookup(wid) {
         // fixme; jank method to create statevar string
         let sv = "(";
         if (strategyJSON["statevars"].length !== 0) {
@@ -342,7 +340,7 @@
                 if (i !== 0) {
                     sv += ",";
                 }
-                sv += global_counts[i];
+                sv += globalCounts[i];
             }
             sv += ")";
         } else {
@@ -356,21 +354,24 @@
         }
     }
 
-    function best_action() {
+    function bestAction() {
         if (strategyJSON === null) return Infinity;
         let mn = Infinity;
         for (let wid = 0; wid < NWORDS; ++wid) {
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
-                mn = Math.min(mn, strategy_lookup(wid));
+                mn = Math.min(mn, strategyLookup(wid));
             }
         }
         return mn;
     }
 
-    function show_words() {
-
-        let best = best_action();
+    function showWords() {
+        let best = bestAction();
         let res = [];
+        const correctLetters = sureLetters.reduce(function (acc, curr) {
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {});
+
         for (let wid = 0; wid < NWORDS; ++wid) {
             let word = {wid: wid, word: "", knowledge: [2, 2, 2, 2, 2], cost: Infinity};
 
@@ -378,55 +379,36 @@
             for (let i = 0; i < $responseHistoryStore.length; i++) {
                 let guess = $responseHistoryStore[i].map((x) => x[0]).join("");
                 let num_guess = convertStringToCharArray(guess);
-                if (word_id(num_guess) === wid) {
+                if (wordWid(num_guess) === wid) {
                     break;
                 }
             }
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
-                for (let p = 0; p < NPOS; ++p) {
-                    let char = String.fromCharCode(97 + WORDS[wid][p]);
+                // for NPOS; for NLETTER, if knowledge[p][l] is 1, then correct and put knowledge 0 to word
 
-                    // if counts for current letter is positive and is not known sure letter, mark knowledge as 1
-                    if (global_counts[WORDS[wid][p]] > 0) {
-                        let already_correct = false;
+                for (let n = 0; n < NPOS; n++) {
+                    let char = WORDS[wid][n];
 
-                        for (let i = 0; i < NPOS; i++) {
-                            if (sure_letters[i] != WORDS[wid][p]) {
-                                already_correct = true;
-                            }
-                        }
-
-                        if (already_correct) {
-                            word["knowledge"][p] = 1;
-                        }
-                    }
-                    // if sure about current letter being correct, mark it as 0
-                    if (sure_letters[p] === WORDS[wid][p]) {
-                        word["knowledge"][p] = 0;
+                    // if counts for current letter is positive and is not known sure letter, mark knowledge as maybe
+                    if (globalCounts[char] > (correctLetters[char] || 0)) {
+                        word["knowledge"][n] = 1;
                     }
 
-                    word["word"] += char;
+                    if (knowledge[n][char] === Response.SURELY) {
+                        word["knowledge"][n] = 0;
+                    }
+                    word["word"] += String.fromCharCode(97 + char);
                 }
-
 
                 // if best action is not infinity, then we are in strategy mode??
                 // Perhaps we have knowledge and are now able to query strategy to make a decision
                 if (best !== Infinity) {
-                    let cst = strategy_lookup(wid);
-                    if (cst === undefined) { //if (cst === undefined) { previously
-                        //alert("error at wid: " + wid + " with no cost from strat: " + cst);
+                    let cst = strategyLookup(wid);
+                    if (cst === undefined) {
                         continue;
                     }
                     word['cost'] = cst;
                 }
-                /*
-                btn += "</button>";
-                if (best === Infinity) {
-                    proposals += btn;
-                } else {
-                    res.push({btn: btn, val: strategy_lookup(wid)})
-                }*/
-
             }
             res.push(word);
         }
@@ -435,25 +417,21 @@
             res.sort((a, b) => {
                 return a.cost - b.cost;
             });
-
-            //for (let o = 0; o < res.length; ++o)
-            //    proposals += res[o].btn;
         }
-
 
         proposalsStore.set(res.sort((a, b) => {
             return a.cost - b.cost;
         }));
     }
 
-    function display_knowledge() {
+    function displayKnowledge() {
         // fixme: port to svelte component if requirement arises
         let knhtml = "<table class='knowledge'>";
         for (let p = 0; p < NPOS; ++p) {
             if (p === 0) {
                 knhtml += "<tr>";
                 for (let l = 0; l < NLETTER; ++l)
-                    knhtml += "<th>" + global_counts[l] + "</th>";
+                    knhtml += "<th>" + globalCounts[l] + "</th>";
                 knhtml += "</tr>";
             }
             knhtml += "<tr>";
@@ -482,16 +460,43 @@
     // when responsehistory changes, take the last element and update_all()
     $: {
         if ($responseHistoryStore.length > 0) {
-            update_all();
+            updateAal();
         }
     }
 
 
 </script>
 
+<!--display global counts and knowledge with counts as header for each letter, and each NPOS for knowledge -->
 <!--<div class="driver">
-    <Button variant="raised" on:click={update_all}>Query strategy</Button>
-    <Button variant="raised" on:click={show_words}>Show words</Button>
+    <div class="global_counts">
+        <table class="global_counts">
+            <tr>
+                {#each globalCounts as count}
+                    <th>{count}</th>
+                {/each}
+            </tr>
+        </table>
+    </div>
+    <div class="knowledge">
+        <table class="knowledge">
+            {#each knowledge as row}
+                <tr>
+                    {#each row as col}
+                        <td>
+                            {#if col === 0}
+                                <b>{col}</b>
+                            {:else if col === 1}
+                                <i>{col}</i>
+                            {:else}
+                                {col}
+                            {/if}
+                        </td>
+                    {/each}
+                </tr>
+            {/each}
+        </table>
+    </div>
 </div>-->
 
 <style>
