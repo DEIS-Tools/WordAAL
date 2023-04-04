@@ -1,54 +1,72 @@
 <script>
-    import {responseHistoryStore} from '../stores/stores.js';
+    import {guessStore, guessSubmitTrigger, responseHistoryStore} from '../stores/stores.js';
     import Key from "./Key.svelte";
+    import {fly} from "svelte/transition";
+
+
+    const fiveSpaces = [];
+    let prelimGuess = fiveSpaces;
+
+    $:{
+        // when keyboard event, replace a key in representation of guessStore, applying transition directive
+        if ($guessStore !== undefined && $guessStore.length >= 0) {
+            prelimGuess = $guessStore;
+            while (prelimGuess.length < 5) {
+                prelimGuess += " ";
+            }
+        } else {
+            if ($guessSubmitTrigger) {
+                console.log("guessSubmitTrigger")
+                prelimGuess = fiveSpaces;
+            }
+        }
+    }
+
 
 </script>
 <div class="history">
-    <table>
-        <tr>
-            {#if ($responseHistoryStore !== undefined && $responseHistoryStore.length > 0)}
-                {#if $responseHistoryStore[0].length > 0}
-                    {#each $responseHistoryStore as responseHistory, idxWord}
-                        {idxWord + 1}
-                        {#each responseHistory as guess, idxLetter}
-                            <Key value={guess[0].toUpperCase()}
-                                 state={guess[1]}/>
-                        {/each}
-                        <br/>
-
+    {#if ($responseHistoryStore !== undefined && $responseHistoryStore.length > 0)}
+        {#if $responseHistoryStore[0].length > 0}
+            {#each $responseHistoryStore as responseHistory, idxWord}
+                <div class="historyEntry" in:fly={{x:-100, duration: 500}}>
+                    &nbsp;  {idxWord + 1} &nbsp;
+                    {#each responseHistory as guess, idxLetter}
+                        <Key value={guess[0].toUpperCase()}
+                             state={guess[1]}/>
                     {/each}
-                {/if}
-            {/if}
-            &nbsp;&nbsp;
-            <Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/><Key value=" " state="2"/>
-            <br/>
-        </tr>
-    </table>
+                </div>
+            {/each}
+        {/if}
+    {/if}
+    <div class="historyEntry">
+        &nbsp; {$responseHistoryStore.length + 1} &nbsp;
+        {#each prelimGuess as guess, idxLetter}
+            <Key value={guess.toUpperCase()} state={2}/>
+        {/each}
+    </div>
 </div>
 
 <style>
 
-    /* proposal should be left-adjusted and not stretched */
-    .history-row {
+    .history {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         justify-content: left;
         align-items: center;
-        padding: 5px;
-        margin: 5px;
+        border-radius: 5px;
         background-color: rgba(255, 255, 255, 0.81);
     }
 
-    .history-row:hover {
-        background-color: rgba(150, 238, 150, 0.81);
+    .historyEntry:hover {
+        background-color: rgba(211, 211, 211, 0.81);
+        border-radius: 6px;
     }
 
-    /* align proposals-box to right*/
-    .history {
+    .historyEntry {
         display: flex;
+        flex-direction: row;
         justify-content: flex-end;
-        padding: 5px;
-        margin: 5px;
+        align-items: center;
     }
 
 </style>

@@ -1,5 +1,14 @@
 <script>
-    export let value = ""
+    import {
+        blur,
+        crossfade,
+        draw,
+        fade,
+        fly,
+        scale,
+        slide,
+    } from 'svelte/transition';
+    export let value = " "
     // 0 = green, 1 = yellow, 2 = grey
     const states = [0, 1, 2];
     export let state = 0;

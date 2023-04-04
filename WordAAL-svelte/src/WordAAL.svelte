@@ -8,15 +8,14 @@
 <script>
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
-    import WordPicker from "./components/WordPicker.svelte";
     import StrategyDriver from "./components/StrategyDriver.svelte";
-    import StrategyChooser from "./components/StrategyChooser.svelte";
-    import {createEventDispatcher} from "svelte";
     import {guessStore, guessSubmitTrigger, targetWordStore} from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
+    import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
+    import SettingsChooser from "./components/SettingsChooser.svelte";
+    import Card from '@smui/card';
 
-    const dispatch = createEventDispatcher();
 
     const onWordleKeyDown = (event) => {
         // backspace: remove the last character
@@ -49,14 +48,6 @@
 
     }
 
-    /*    $: {
-            console.log("guessStore", $guessStore);
-            console.log("responseStore", $responseStore);
-            console.log("responseHistoryStore", $responseHistoryStore);
-            console.log("targetWordStore", $targetWordStore);
-            console.log("newGameTrigger", $newGameTrigger);
-        }*/
-
     let wordaalLogo = [
         {value: "W", state: 0},
         {value: "o", state: 1},
@@ -67,22 +58,18 @@
         {value: "L", state: 2},
     ]
 
-    // todo: unused, make all communication through stores
-    function handleStrategyConfig(event) {
-        console.log(event.detail)
-        dispatch('strategyConfigEvent', event.detail)
-    }
+    let gameOptionsOpen = true;
 
 </script>
 
 <main>
-    <div>
-        {#each wordaalLogo as k}
+    <div class="logo">
+        {#each wordaalLogo as k, i}
             <Key {...k} clickable="true"/>
         {/each}
-        <br/>
-        <i>UPPAAL Stratego playing Wordle</i>
     </div>
+    <br/>
+    <i>UPPAAL Stratego playing Wordle</i>
 
     <div class="wrapper">
         <div class="left">
@@ -99,21 +86,20 @@
         <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
     </div>
 
-    <div class="settings">
-        <div class="wrapper">
-            <div class="left">
-                <WordPicker/>
-            </div>
-            <div class="right">
-                <StrategyChooser on:strategyConfigEvent={handleStrategyConfig}/>
-            </div>
-        </div>
-
-    </div>
-
+    <CollapsiblePanel title={'Game options'} color={'black'} bind:isPanelOpen={gameOptionsOpen}>
+        <Card padded>
+            <SettingsChooser/>
+        </Card>
+    </CollapsiblePanel>
 </main>
 
 <style>
+    .logo {
+        transform: scale(1.25);
+        margin: 0 auto;
+        text-align: center;
+    }
+
     .wrapper {
         display: flex;
 

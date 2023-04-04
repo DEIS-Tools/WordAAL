@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 
     import {
         NLETTER,
@@ -7,9 +7,15 @@
         WORDS,
         convertStringToCharArray,
     } from "../lib/Consts.svelte";
-    import {guessStore, proposalsStore, responseHistoryStore, strategyStore} from "../stores/stores.js";
-    import Button from "@smui/button";
+    import {guessStore, proposalsStore, responseHistoryStore, strategyStore, newGameTrigger} from "../stores/stores.js";
+    import Snackbar, {Label} from '@smui/snackbar';
 
+
+    let snackbarDriverInfo: Snackbar;
+    let snackbarDriverInfoText = "";
+
+    let snackbarDriverError: Snackbar;
+    let snackbarDriverErrorText = "";
 
     let strategyJSON = [];
     let strategy;
@@ -37,6 +43,31 @@
     let knowledge = new Array(NPOS);
     for (let i = 0; i < NPOS; ++i) {
         knowledge[i] = new Array(NLETTER).fill(0);
+    }
+
+    function reset() {
+        // used for caching hardmode words
+        hard = new Array(NWORDS).fill(true);
+
+        // counts of maximal number of occurrences for each letter observed in a single word
+        globalCounts = new Array(NLETTER).fill(0);
+
+        // init: confident placement of letters
+        sureLetters = new Array(NPOS).fill(-1);
+
+        // init: knowledge array
+        knowledge = new Array(NPOS);
+        for (let i = 0; i < NPOS; ++i) {
+            knowledge[i] = new Array(NLETTER).fill(0);
+        }
+    }
+
+    $: {
+        if ($newGameTrigger) {
+            console.error("Hit new game trigger in driver")
+            reset();
+            newGameTrigger.set(false);
+        }
     }
 
     function parseStrategyConfigEvent(store) {
@@ -75,7 +106,9 @@
             if (xobj.readyState === 4 && xobj.status === 200) {
                 // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
                 strategyJSON = JSON.parse(xobj.responseText);
-                console.log("driver: loaded strategy from " + path);
+                //let modeText: string = $strategyStore['hard'] ? "hard" : "easy";
+                //snackbarDriverInfoText = `driver: finished loading strategy ${$strategyStore.s.name} on ${modeText} mode`;
+                //snackbarDriverInfo.open();
                 showWords();
             }
         };
@@ -215,7 +248,7 @@
 
     function updatePermissive(response, guess) {
         updateConservative(response, guess);
-        checkSums(response);
+        checkSums();
     }
 
     function wordWid(guess) {
@@ -288,19 +321,22 @@
         // lookup word in wordlist
         let wid = wordWid(num_guess);
         if (wid === null) {
-            alert("Word is not in word-list '" + $guessStore + "'");
+            snackbarDriverInfoText = "Word is not in word-list '" + guess + "'. Should've been caught by Game-component";
+            snackbarDriverInfo.open();
             return;
         }
 
         if (mode) {
             if (!hard[wid]) {
-                alert("Word is not hard '" + $guessStore + "'");
+                snackbarDriverErrorText = "Word is not hard '" + guess + "'";
+                snackbarDriverError.open();
                 return;
             }
         }
         let has_error = consistent(wid);
         if (has_error !== null) {
-            alert("Word is not consistent with game-mode. '" + $guessStore + "' " + has_error);
+            snackbarDriverErrorText = "Word is not consistent with game-mode. '" + guess + "' " + has_error;
+            snackbarDriverError.open();
             return;
         }
 
@@ -457,54 +493,31 @@
         knowledge_html = knhtml;
     }
 
+
+    async function asyncUpdateStrategy() {
+         updateAal();
+    }
+
     // when responsehistory changes, take the last element and update_all()
     $: {
         if ($responseHistoryStore.length > 0) {
-            updateAal();
+            asyncUpdateStrategy();
+
         }
     }
 
 
 </script>
 
-<!--display global counts and knowledge with counts as header for each letter, and each NPOS for knowledge -->
-<!--<div class="driver">
-    <div class="global_counts">
-        <table class="global_counts">
-            <tr>
-                {#each globalCounts as count}
-                    <th>{count}</th>
-                {/each}
-            </tr>
-        </table>
-    </div>
-    <div class="knowledge">
-        <table class="knowledge">
-            {#each knowledge as row}
-                <tr>
-                    {#each row as col}
-                        <td>
-                            {#if col === 0}
-                                <b>{col}</b>
-                            {:else if col === 1}
-                                <i>{col}</i>
-                            {:else}
-                                {col}
-                            {/if}
-                        </td>
-                    {/each}
-                </tr>
-            {/each}
-        </table>
-    </div>
-</div>-->
+<Snackbar bind:this={snackbarDriverInfo} timeoutMs="{4000}">
+    <Label>{snackbarDriverInfoText}</Label>
+</Snackbar>
+
+<Snackbar bind:this={snackbarDriverError} class="error">
+    <Label>{snackbarDriverErrorText}</Label>
+</Snackbar>
+
 
 <style>
-    .driver {
-        display: compact;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-    }
+
 </style>

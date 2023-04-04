@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import {
         NPOS,
         MAX_N_GUESSES,
@@ -15,10 +15,18 @@
     } from "../stores/stores.js";
 
     import {onMount} from "svelte";
-    import Textfield from "@smui/textfield";
-    import Key from "./Key.svelte";
 
-    let placeholder = new Array(NPOS).fill(0);
+    import Snackbar, {Label} from '@smui/snackbar';
+    import Button from '@smui/button';
+
+    let snackbarSuccess: Snackbar;
+    let snackbarWarning: Snackbar;
+    let snackbarError: Snackbar;
+
+    let successText: string = "DEFAULT SUCCESS TEXT";
+    let warningText: string = "DEFAULT WARNING TEXT";
+    let errorText: string = "DEFAULT ERROR TEXT";
+
 
     onMount(() => {
         console.log("onMount game");
@@ -97,20 +105,40 @@
 
     export function checkGuess() {
         if ($guessStore.length !== NPOS) {
-            alert("Guess must be 5 letters long!");
+            errorText = "Guess must be 5 letters long!";
+            snackbarError.open();
+            setTimeout(() => {
+                guessStore.set("");
+            }, 2000);
         } else if (guessInHistory($guessStore)) {
-            alert("You've already guessed that word!");
+            errorText = `You've already guessed the word '${$guessStore.toUpperCase()}'!`;
+            snackbarError.open();
+            setTimeout(() => {
+                guessStore.set("");
+            }, 2000);
         } else if (!wordInWordlist($guessStore)) {
-            alert("That word is not in the wordlist!");
+            errorText = `Guess '${$guessStore.toUpperCase()}' is not in the wordlist !`;
+            snackbarError.open();
+            setTimeout(() => {
+                guessStore.set("");
+            }, 2000);
         } else {
             // guess is legal, calc response and check for win condition
             wordleResponse();
             if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
-                alert("You've won!");
-                resetGame();
+                successText = `You've won in ${$responseHistoryStore.length} guesses!`;
+                snackbarSuccess.open();
+                setTimeout(() => {
+                    resetGame();
+                }, 5000);
             } else if ($responseHistoryStore.length >= MAX_N_GUESSES) {
-                alert("You've lost!");
-                resetGame();
+                warningText = `You've lost! The word was ${$targetWordStore['cleartext'].toUpperCase()}`;
+                snackbarWarning.open();
+                $guessStore = $targetWordStore['cleartext'];
+                //todo; make modal which shows word and has button to start new game, also show prefilled target word distinct and in green
+                setTimeout(() => {
+                    resetGame();
+                }, 5000);
             }
         }
     }
@@ -119,9 +147,12 @@
     $: if ($guessSubmitTrigger) {
         guessSubmitTrigger.update((x) => {
             checkGuess();
+            setTimeout(() => {
+            }, 100);
             return !x;
         });
     }
+
 
 </script>
 
@@ -130,13 +161,36 @@
 <!--<Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
            input$maxlength={NPOS} autofocus/>-->
 
+<Snackbar bind:this={snackbarSuccess} class="success">
+    <Label>{successText}</Label>
+</Snackbar>
 
-<style>
-    .box {
-        display: flex;
-        flex-direction: row;
-        float: inside;
-        padding: 5px;
-        margin: 5px;
-    }
+<Snackbar bind:this={snackbarWarning} class="warning">
+    <Label>{warningText}</Label>
+</Snackbar>
+
+<Snackbar bind:this={snackbarError} class="error">
+    <Label>{errorText}</Label>
+</Snackbar>
+<!-- DEBUG opening of snackbars
+<Button on:click={() => snackbarSuccess && snackbarSuccess.open()}>
+    <Label>Success</Label>
+</Button>
+
+<Button on:click={() => snackbarWarning && snackbarWarning.open()}>
+    <Label>Warning</Label>
+</Button>
+
+<Button on:click={() => snackbarError && snackbarError.open()}>
+    <Label>Error</Label>
+</Button>-->
+
+<style lang="scss">
+  .box {
+    display: flex;
+    flex-direction: row;
+    float: inside;
+    padding: 5px;
+    margin: 5px;
+  }
 </style>

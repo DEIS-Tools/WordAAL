@@ -1,3 +1,32 @@
+// See https://github.com/material-components/material-components-web/tree/v14.0.0/packages/mdc-snackbar
+@use '@material/snackbar/mixins';
+// See https://github.com/material-components/material-components-web/tree/v14.0.0/packages/mdc-theme
+@use '@material/theme/color-palette';
+@use '@material/theme/theme-color';
+
+
+.mdc-snackbar.success {
+    @include mixins.fill-color(rgb(121, 184, 81));
+    @include mixins.label-ink-color(
+                    theme-color.accessible-ink-color(color-palette.$green-500)
+    );
+}
+
+.mdc-snackbar.warning {
+    @include mixins.fill-color(#f3c237);
+    @include mixins.label-ink-color(
+                    theme-color.accessible-ink-color(color-palette.$orange-500)
+    );
+}
+
+.mdc-snackbar.error {
+    @include mixins.fill-color(color-palette.$red-500);
+    @include mixins.label-ink-color(
+                    theme-color.accessible-ink-color(color-palette.$red-500)
+    );
+}
+
+
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
@@ -13,13 +42,6 @@
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
 }
-
-/*
-green:79b851
-yellow: f3c237
-grey: a4aec4
-none: dce1ed
- */
 
 a {
     font-weight: 500;
@@ -91,3 +113,6 @@ button:focus-visible {
         background-color: #f9f9f9;
     }
 }
+
+
+

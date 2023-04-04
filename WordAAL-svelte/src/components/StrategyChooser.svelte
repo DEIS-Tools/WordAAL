@@ -6,9 +6,6 @@
     import FormField from '@smui/form-field';
 
 
-    let hard = true;
-
-
     let availableStrats = [
         {
             name: "combined",
@@ -31,6 +28,7 @@
 
     let strategy = availableStrats[1];
 
+    let hard = true;
     $: {
         if (strategy.name === "permissive" && !hard) {
             alert("Permissive mode is only compatible with hard mode - turning it on now.")
@@ -46,31 +44,30 @@
         }
     }
 
+
+
+
 </script>
-
-
-<div class="strategies">
-    <SegmentedButton segments={availableStrats} let:segment singleSelect bind:selected={strategy}>
-        <Segment {segment} touch title={segment.name}>
-            <Label>{segment.name}</Label>
-        </Segment>
-    </SegmentedButton>
-    <FormField>
-        <Switch bind:checked={hard} touch/>
-        <span slot="label">Hard-mode</span>
-    </FormField>
-</div>
+    <div class="strategies">
+        <p>Strategy:&nbsp;</p>
+        <SegmentedButton segments={availableStrats} let:segment singleSelect bind:selected={strategy}>
+            <Segment {segment} touch title={segment.name}>
+                <Label>{segment.name}</Label>
+            </Segment>
+        </SegmentedButton>
+        <p>&nbsp;Hard-mode:&nbsp;</p>
+        <FormField>
+            <Switch bind:checked={hard} touch/>
+        </FormField>
+    </div>
 
 
 <style>
-    .strat-select {
-        text-align: left;
-        padding: 2em;
-    }
-
-    /* active strategy in box*/
-    .active-strategy {
-        text-align: center;
-        padding: 1em;
+    .strategies {
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        align-items: center;
+        border-radius: 5px;
     }
 </style>

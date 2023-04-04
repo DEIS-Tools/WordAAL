@@ -1,4 +1,4 @@
-import './app.css'
+import './app.scss'
 import App from './WordAAL.svelte'
 
 const app = new App({
