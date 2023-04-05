@@ -56,7 +56,7 @@
                 knowledge[n] = 1;
             }
 
-            if ($knowledgeStore[n][char] === Response.SURELY) {
+            if ($sureLettersStore[n] === char) {
                 knowledge[n] = 0;
             }
         }
