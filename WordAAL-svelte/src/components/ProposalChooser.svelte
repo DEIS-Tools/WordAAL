@@ -47,12 +47,10 @@
 
     function costShade(cost) {
         let min = Math.min(...proposals.map(proposal => proposal.cost));
-        let max = Math.max(...proposals.map(proposal => proposal.cost).filter(c => c !== Infinity));
-        console.log(min, max)
+        let max = Math.max(...proposals.map(proposal => proposal.cost));
 
         // normalise cost to be between 0 and 1 based on min and max
         cost = (cost - min) / (max - min);
-
 
         // use sigmoid between calculated min and max to get a color
         let r = 255 * (1 / (1 + Math.exp(-10 * (cost - 0.5))));
@@ -61,7 +59,6 @@
         // make r and g less harsh
         r = r * 0.5 + 127.5;
         g = g * 0.5 + 127.5;
-
 
         return `rgb(${r}, ${g}, 0)`;
     }
