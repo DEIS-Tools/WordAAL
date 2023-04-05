@@ -1,8 +1,15 @@
 <script lang="ts">
-    import {guessStore, guessSubmitTrigger, newGameTrigger, proposalsStore, hideProposalsStore} from "../stores/stores.js";
+    import {
+        guessStore,
+        guessSubmitTrigger,
+        newGameTrigger,
+        proposalsStore,
+        hideProposalsStore
+    } from "../stores/stores.js";
     import Key from "./Key.svelte";
     import {fly} from 'svelte/transition';
     import CircularProgress from '@smui/circular-progress';
+    import Chip, {Set, Text} from '@smui/chips';
 
     import {NUM_PROPOSALS} from "../lib/Consts.svelte"
 
@@ -38,7 +45,53 @@
             }
         });*/
 
+    function costShade(cost) {
+        let min = Math.min(...proposals.map(proposal => proposal.cost));
+        let max = Math.max(...proposals.map(proposal => proposal.cost).filter(c => c !== Infinity));
+        console.log(min, max)
+
+        // normalise cost to be between 0 and 1 based on min and max
+        cost = (cost - min) / (max - min);
+
+
+        // use sigmoid between calculated min and max to get a color
+        let r = 255 * (1 / (1 + Math.exp(-10 * (cost - 0.5))));
+        let g = 255 * (1 / (1 + Math.exp(-10 * (0.5 - cost))));
+
+        // make r and g less harsh
+        r = r * 0.5 + 127.5;
+        g = g * 0.5 + 127.5;
+
+
+        return `rgb(${r}, ${g}, 0)`;
+    }
+
+
 </script>
+
+{#if proposals.length === 0}
+    <div class="loading">
+        <CircularProgress style="height: 64px; width: 64px;" indeterminate/>
+        <p>Loading proposals...</p><br/>
+    </div>
+{:else}
+    {#each proposals as proposal}
+        <div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
+            <div class="proposal" on:click={() => propose(proposal.word)}>
+                {#each proposal.word as letter, letterIndex}
+                    <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
+                {/each}
+                <Set chips={['1']} let:chip nonInteractive>
+                    <Chip {chip}>
+                        <p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)} &nbsp;</p>
+                    </Chip>
+                </Set>
+                <!--<p style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)} &nbsp;</p>-->
+
+            </div>
+        </div>
+    {/each}
+{/if}
 
 <!--FIXME: Async attempt-->
 <!--{#await promise}
@@ -65,26 +118,12 @@
 {/await}-->
 
 
-{#if proposals.length === 0}
-    <div class="loading">
-        <CircularProgress style="height: 64px; width: 64px;" indeterminate/>
-        <p>Loading proposals...</p><br/>
-    </div>
-{:else}
-    {#each proposals as proposal}
-        <div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
-            <div class="proposal" on:click={() => propose(proposal.word)}>
-                {#each proposal.word as letter, letterIndex}
-                    <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
-                {/each}
-                <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(3)} &nbsp;</div>
-
-            </div>
-        </div>
-    {/each}
-{/if}
-
 <style>
+    .cost {
+        font-size: 20px;
+        font-weight: bold;
+        -webkit-text-stroke: 1px rgba(124, 107, 107, 0.81);
+    }
     .proposal {
         display: flex;
         flex-direction: row;
