@@ -70,6 +70,14 @@
         }
     }
 
+    function rollbackCurrentGuess() {
+        console.warn("driver: resetting current/last guess due to inconsistency error");
+        if ($responseHistoryStore.length > 0) {
+            $responseHistoryStore.pop();
+            responseHistoryStore.set($responseHistoryStore);
+        }
+    }
+
     $: {
         if ($newGameTrigger) {
             console.error("Hit new game trigger in driver")
@@ -331,6 +339,7 @@
         if (wid === null) {
             snackbarDriverInfoText = "Word is not in word-list '" + guess + "'. Should've been caught by Game-component";
             snackbarDriverInfo.open();
+            rollbackCurrentGuess();
             return;
         }
 
@@ -338,6 +347,7 @@
             if (!hard[wid]) {
                 snackbarDriverErrorText = "Word is not hard '" + guess + "'";
                 snackbarDriverError.open();
+                rollbackCurrentGuess();
                 return;
             }
         }
@@ -345,6 +355,7 @@
         if (has_error !== null) {
             snackbarDriverErrorText = "Word is not consistent with game-mode. '" + guess + "' " + has_error;
             snackbarDriverError.open();
+            rollbackCurrentGuess();
             return;
         }
 
