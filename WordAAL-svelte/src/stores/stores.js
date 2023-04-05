@@ -18,3 +18,9 @@ export const hideProposalsStore = writable(false);
 export const newGameTrigger = writable(false);
 export const guessSubmitTrigger = writable(false);
 
+export const knowledgeStore = writable(new Array(NPOS));
+
+export const sureLettersStore = writable(new Array(NPOS).fill(-1));
+
+export const globalCountsStore = writable(new Array(NLETTER).fill(0));
+

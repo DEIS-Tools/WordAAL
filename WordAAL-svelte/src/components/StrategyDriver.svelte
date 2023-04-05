@@ -7,7 +7,15 @@
         WORDS,
         convertStringToCharArray,
     } from "../lib/Consts.svelte";
-    import {guessStore, proposalsStore, responseHistoryStore, strategyStore, newGameTrigger} from "../stores/stores.js";
+    import {
+        proposalsStore,
+        responseHistoryStore,
+        strategyStore,
+        newGameTrigger,
+        knowledgeStore,
+        sureLettersStore,
+        globalCountsStore,
+    } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
 
@@ -351,6 +359,10 @@
             updatePermissive(response, num_guess);
         }
         displayKnowledge();
+        // update state into store for use in highlighting in game component
+        knowledgeStore.set(knowledge);
+        sureLettersStore.set(sureLetters);
+        globalCountsStore.set(globalCounts);
         showWords();
     }
 
@@ -495,7 +507,7 @@
 
 
     async function asyncUpdateStrategy() {
-         updateAal();
+        updateAal();
     }
 
     // when responsehistory changes, take the last element and update_all()

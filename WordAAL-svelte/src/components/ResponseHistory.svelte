@@ -1,14 +1,23 @@
 <script>
-    import {guessStore, guessSubmitTrigger, responseHistoryStore} from '../stores/stores.js';
+    import {
+        guessStore,
+        guessSubmitTrigger,
+        responseHistoryStore,
+        sureLettersStore,
+        globalCountsStore,
+        knowledgeStore,
+    } from '../stores/stores.js';
     import Key from "./Key.svelte";
     import {fly} from "svelte/transition";
-
+    import Response from "./StrategyDriver.svelte"
+    import {NPOS, ASCII_OFFSET} from "../lib/Consts.svelte"
 
     const fiveSpaces = [];
     let prelimGuess = fiveSpaces;
+    let knowledge = new Array(NPOS).fill(1);
 
     $:{
-        // when keyboard event, replace a key in representation of guessStore, applying transition directive
+        // when keyboard event, replace a key in representation of guessStore
         if ($guessStore !== undefined && $guessStore.length >= 0) {
             prelimGuess = $guessStore;
             while (prelimGuess.length < 5) {
@@ -20,8 +29,38 @@
                 prelimGuess = fiveSpaces;
             }
         }
+        // reset and recalc prelim knowledge
+        knowledge = new Array(NPOS).fill(2);
+        colourPrelimGuess()
     }
 
+    function colourPrelimGuess() {
+        // check if undefined
+        if ($knowledgeStore[0] === undefined) {
+            return;
+        }
+
+        const correctLetters = $sureLettersStore.reduce(function (acc, curr) {
+            return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
+        }, {});
+
+
+        // convert prelim guess to 0-indexed character
+        let guess = prelimGuess.trim().toLowerCase();
+
+        for (let n = 0; n < guess.length; n++) {
+            let char = guess.charCodeAt(n) - ASCII_OFFSET;
+
+            // if counts for current letter is positive and is not known sure letter, mark knowledge as maybe
+            if ($globalCountsStore[char] > (correctLetters[char] || 0)) {
+                knowledge[n] = 1;
+            }
+
+            if ($knowledgeStore[n][char] === Response.SURELY) {
+                knowledge[n] = 0;
+            }
+        }
+    }
 
 </script>
 <div class="history">
@@ -41,7 +80,7 @@
     <div class="historyEntry">
         &nbsp; {$responseHistoryStore.length + 1} &nbsp;
         {#each prelimGuess as guess, idxLetter}
-            <Key value={guess.toUpperCase()} state={2}/>
+            <Key value={guess.toUpperCase()} state={knowledge[idxLetter]}/>
         {/each}
     </div>
 </div>
