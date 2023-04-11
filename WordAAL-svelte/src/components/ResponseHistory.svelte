@@ -68,7 +68,9 @@
         {#if $responseHistoryStore[0].length > 0}
             {#each $responseHistoryStore as responseHistory, idxWord}
                 <div class="historyEntry" in:fly={{x:-100, duration: 500}}>
-                    &nbsp;  {idxWord + 1} &nbsp;
+                    <div style="align-items: center">
+                        &nbsp;  {idxWord + 1} &nbsp;
+                    </div>
                     {#each responseHistory as guess, idxLetter}
                         <Key value={guess[0].toUpperCase()}
                              state={guess[1]}/>
@@ -78,7 +80,9 @@
         {/if}
     {/if}
     <div class="historyEntry">
-        &nbsp; {$responseHistoryStore.length + 1} &nbsp;
+        <div style="align-items: center">
+            &nbsp; {$responseHistoryStore.length + 1} &nbsp;
+        </div>
         {#each prelimGuess as guess, idxLetter}
             <Key value={guess.toUpperCase()} state={knowledge[idxLetter]}/>
         {/each}

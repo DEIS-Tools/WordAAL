@@ -15,6 +15,7 @@
         knowledgeStore,
         sureLettersStore,
         globalCountsStore,
+        hideProposalsStore,
     } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
@@ -517,15 +518,16 @@
     }
 
 
+    //fixme: is not async in anything but name
     async function asyncUpdateStrategy() {
         updateAal();
     }
 
     // when responsehistory changes, take the last element and update_all()
     $: {
-        if ($responseHistoryStore.length > 0) {
+        // allow for updating if only one hand-written guess has been made so-far, as driver can only cope with one
+        if ($responseHistoryStore.length > 0 && ($hideProposalsStore === false || responseHistoryStore.length < 2)) {
             asyncUpdateStrategy();
-
         }
     }
 

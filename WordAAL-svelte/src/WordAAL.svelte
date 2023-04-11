@@ -1,8 +1,24 @@
 <svelte:head>
     <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/svelte-material-ui@6.0.0/bare.min.css"
+            href="https://fonts.googleapis.com/icon?family=Material+Icons"
     />
+    <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,600,700"
+    />
+    <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css?family=Roboto+Mono"
+    />
+    <link rel="stylesheet" href="node_modules/svelte-material-ui/bare.css"/>
+    <!-- SMUI Styles -->
+    <link
+            rel="stylesheet"
+            href="node_modules/svelte-material-ui/themes/svelte.css"
+            media="(prefers-color-scheme: light)"
+    />
+
 </svelte:head>
 
 <script>
@@ -58,7 +74,7 @@
         {value: "L", state: 2},
     ]
 
-    let gameOptionsOpen = true;
+    let gameOptionsOpen = false;
 
 </script>
 
@@ -81,10 +97,7 @@
         </div>
     </div>
 
-
-    <div>
-        <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
-    </div>
+    <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
 
     <CollapsiblePanel title={'Game options'} color={'black'} bind:isPanelOpen={gameOptionsOpen}>
         <Card padded>
@@ -102,7 +115,6 @@
 
     .wrapper {
         display: flex;
-
         border: 1px solid grey;
         border-radius: 10px;
         padding: 32px 16px;
@@ -110,13 +122,18 @@
     }
 
     .left {
+        display: flex;
         flex-grow: 2;
-        padding: 5px;
+        padding: 10px;
+
     }
 
     .right {
+        display: flex;
+        justify-content: center;
         flex-grow: 1;
-        padding: 5px;
+        padding: 10px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
+        min-width: 450px;
     }
 </style>

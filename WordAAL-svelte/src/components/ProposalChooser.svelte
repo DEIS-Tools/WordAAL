@@ -7,9 +7,9 @@
         hideProposalsStore
     } from "../stores/stores.js";
     import Key from "./Key.svelte";
-    import {fly} from 'svelte/transition';
+    import {fly, fade} from 'svelte/transition';
     import CircularProgress from '@smui/circular-progress';
-    import Chip, {Set, Text} from '@smui/chips';
+    import Chip, {Set, Text, TrailingIcon} from '@smui/chips';
 
     import {NUM_PROPOSALS} from "../lib/Consts.svelte"
 
@@ -57,15 +57,16 @@
             guessSubmitTrigger.set(true);
         }, 100);
     }
-
 </script>
 
-{#if loading}
-    <div class="loading">
-        <CircularProgress style="height: 64px; width: 64px;" indeterminate/>
-    </div>
-{:else}
-    <div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
+<div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
+    {#if loading}
+        <div class="loading" in:fade={{x:100, duration: 500}}>
+            <CircularProgress style="height: 80px; width: 80px;" indeterminate/>
+            Loading proposals...
+        </div>
+    {:else}
+        <div in:fade={{duration:500}}>
         {#each proposals as proposal}
             <div class="proposal" on:click={() => {propose(proposal.word)}}>
                 {#each proposal.word as letter, letterIndex}
@@ -73,19 +74,22 @@
                 {/each}
                 <Set chips={['1']} let:chip nonInteractive>
                     <Chip {chip}>
-                        <p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)}
+                        <Text><p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)}
                             &nbsp;</p>
+                        </Text>
+                        <TrailingIcon class="material-icons">payments</TrailingIcon>
                     </Chip>
                 </Set>
             </div>
         {/each}
-    </div>
-{/if}
+        </div>
+    {/if}
+</div>
 
 
 <style>
     .cost {
-        font-size: 22px;
+        font-size: 24px;
         font-weight: bold;
         -webkit-text-stroke: 1px rgba(124, 107, 107, 0.81);
         -webkit-font-smoothing: antialiased;
@@ -107,7 +111,7 @@
 
     .loading {
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         justify-content: center;
         align-items: center;
     }
@@ -119,6 +123,7 @@
 
     .proposal-box-blur {
         display: flex;
+        flex-direction: column;
         -webkit-transition: all 0.5s ease;
         -moz-transition: all 0.5s ease;
         -o-transition: all 0.5s ease;
