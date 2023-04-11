@@ -13,23 +13,8 @@
 
     import {NUM_PROPOSALS} from "../lib/Consts.svelte"
 
+    let loading = true;
     let proposals = [];
-
-    $: {
-        let p = $proposalsStore;
-        if (Array.isArray(p)) {
-            p = p.filter(proposal => proposal.cost !== Infinity);
-            proposals = p.slice(0, NUM_PROPOSALS);
-        }
-    }
-
-    function propose(guess) {
-        proposals = [];
-        setTimeout(() => {
-            guessStore.set(guess);
-            guessSubmitTrigger.set(true);
-        }, 50);
-    }
 
     $: {
         // when new game is triggered, clear the proposals
@@ -37,13 +22,6 @@
             proposals = [];
         }
     }
-
-    /*    let promise = proposalsStore.subscribe(proposals => {
-            if (Array.isArray(proposals)) {
-                proposals = proposals.filter(proposal => proposal.cost !== Infinity);
-                return proposals.slice(0, NUM_PROPOSALS);
-            }
-        });*/
 
     function costShade(cost) {
         let min = Math.min(...proposals.map(proposal => proposal.cost));
@@ -64,63 +42,56 @@
     }
 
 
+    $: {
+        let p = $proposalsStore;
+        if (Array.isArray(p)) {
+            proposals = p.filter(proposal => proposal.cost !== Infinity).slice(0, NUM_PROPOSALS);
+            loading = false;
+        }
+    }
+
+    function propose(guess) {
+        loading = true;
+        setTimeout(() => {
+            guessStore.set(guess);
+            guessSubmitTrigger.set(true);
+        }, 100);
+    }
+
 </script>
 
-{#if proposals.length === 0}
+{#if loading}
     <div class="loading">
         <CircularProgress style="height: 64px; width: 64px;" indeterminate/>
-        <p>Loading proposals...</p><br/>
     </div>
 {:else}
-    {#each proposals as proposal}
-        <div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
-            <div class="proposal" on:click={() => propose(proposal.word)}>
+    <div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
+        {#each proposals as proposal}
+            <div class="proposal" on:click={() => {propose(proposal.word)}}>
                 {#each proposal.word as letter, letterIndex}
                     <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
                 {/each}
                 <Set chips={['1']} let:chip nonInteractive>
                     <Chip {chip}>
-                        <p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)} &nbsp;</p>
+                        <p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)}
+                            &nbsp;</p>
                     </Chip>
                 </Set>
-                <!--<p style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)} &nbsp;</p>-->
-
             </div>
-        </div>
-    {/each}
+        {/each}
+    </div>
 {/if}
-
-<!--FIXME: Async attempt-->
-<!--{#await promise}
-    <div class="loading">
-        <CircularProgress style="height: 64px; width: 64px;" indeterminate/>
-        <p>Loading proposals...</p><br/>
-    </div>
-{:then foo}
-    {#each proposals as proposal}
-        <div class="proposals-box" transition:fly={{x:100, duration: 500}}>
-            <div class="proposal" on:click={() => propose(proposal.word)}>
-                {#each proposal.word as letter, letterIndex}
-                    <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
-                {/each}
-                <div style="margin-left: 5px; margin-right: 5px;">{proposal.cost.toFixed(3)}</div>
-
-            </div>
-        </div>
-    {/each}
-{:catch error}
-    <div class="loading">
-        <p>Error loading proposals: {error}</p><br/>
-    </div>
-{/await}-->
 
 
 <style>
     .cost {
-        font-size: 20px;
+        font-size: 22px;
         font-weight: bold;
         -webkit-text-stroke: 1px rgba(124, 107, 107, 0.81);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
     }
+
     .proposal {
         display: flex;
         flex-direction: row;
@@ -134,29 +105,27 @@
         background-color: rgba(150, 238, 150, 0.81);
     }
 
-    .proposals-box {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-    }
-
     .loading {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100%;
     }
 
+    .proposal-box {
+        display: flex;
+        flex-direction: column;
+    }
 
     .proposal-box-blur {
+        display: flex;
         -webkit-transition: all 0.5s ease;
         -moz-transition: all 0.5s ease;
         -o-transition: all 0.5s ease;
         -ms-transition: all 0.5s ease;
         transition: all 0.5s ease;
         filter: blur(5px);
-
+        pointer-events: none;
     }
 
 </style>

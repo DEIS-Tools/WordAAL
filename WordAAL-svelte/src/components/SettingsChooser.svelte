@@ -3,15 +3,12 @@
     import StrategyChooser from "./StrategyChooser.svelte";
     import FormField from "@smui/form-field";
     import Switch from "@smui/switch";
-    import {Label} from '@smui/common';
 
     import {hideProposalsStore} from "../stores/stores.js";
 
     let hideProposals = false;
 
     $: hideProposalsStore.set(hideProposals);
-
-    $: console.log("hideProposalsStore", $hideProposalsStore);
 </script>
 
 

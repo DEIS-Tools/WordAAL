@@ -121,7 +121,7 @@
         -o-transition: all 0.5s ease;
         -ms-transition: all 0.5s ease;
         transition: all 0.5s ease;
-        filter: blur(5px);
+        /*filter: blur(5px);*/
 
     }
 
