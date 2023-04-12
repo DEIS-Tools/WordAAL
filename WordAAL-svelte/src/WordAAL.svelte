@@ -19,6 +19,9 @@
             media="(prefers-color-scheme: light)"
     />
 
+    <!-- SMUI Styles -->
+    <link rel="stylesheet" href="/smui.css" />
+
 </svelte:head>
 
 <script>
@@ -31,24 +34,29 @@
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
-
     import {Fireworks} from 'fireworks-js'
 
-    let fireworks;
 
+    let fireworks;
     setTimeout(() => {
         const container = document.querySelector("#firework")
-        console.warn("container", container);
         fireworks = new Fireworks(container, {
             acceleration: 1.01,
             intensity: 50,
             opacity: 0.8,
         });
-    }, 1000);
+    }, 200);
 
     winTrigger.subscribe((win) => {
         if (win) {
             fireworks.launch(10);
+            let interval = setInterval(() => {
+                fireworks.launch(5);
+            }, 500);
+            setTimeout(() => {
+                clearInterval(interval)
+            }, 4000)
+
         }
     })
 
@@ -142,6 +150,7 @@
         padding: 32px 16px;
         overflow: hidden; /* will contain if #first is longer than #second */
         min-width: 850px;
+        min-height: 320px;
     }
 
     .left {

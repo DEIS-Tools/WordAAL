@@ -6,7 +6,7 @@
         sureLettersStore,
         globalCountsStore,
         knowledgeStore,
-        winTrigger,
+        winTrigger, targetWordStore,
     } from '../stores/stores.js';
     import Key from "./Key.svelte";
     import {fly} from "svelte/transition";
@@ -68,7 +68,9 @@
     {#if ($responseHistoryStore !== undefined && $responseHistoryStore.length > 0)}
         {#if $responseHistoryStore[0].length > 0}
             {#each $responseHistoryStore as responseHistory, idxWord}
-                <div class="historyEntry" in:fly={{x:-100, duration: 500}}>
+                <!--add class 'winning' if historyEntry is winning word-->
+                <div class="historyEntry" class:winning="{$winTrigger && idxWord === $responseHistoryStore.length - 1}"
+                     in:fly={{x:-100, duration: 500}}>
                     <div style="align-items: center">
                         &nbsp;  {idxWord + 1} &nbsp;
                     </div>
@@ -81,14 +83,14 @@
         {/if}
     {/if}
     {#if !$winTrigger}
-    <div class="historyEntry">
-        <div style="align-items: center">
-            &nbsp; {$responseHistoryStore.length + 1} &nbsp;
+        <div class="historyEntry">
+            <div style="align-items: center">
+                &nbsp; {$responseHistoryStore.length + 1} &nbsp;
+            </div>
+            {#each prelimGuess as guess, idxLetter}
+                <Key value={guess.toUpperCase()} state={knowledge[idxLetter]}/>
+            {/each}
         </div>
-        {#each prelimGuess as guess, idxLetter}
-            <Key value={guess.toUpperCase()} state={knowledge[idxLetter]}/>
-        {/each}
-    </div>
     {/if}
 </div>
 
@@ -113,6 +115,13 @@
         flex-direction: row;
         justify-content: flex-end;
         align-items: center;
+    }
+
+    .winning {
+        /*make winning entry look like a gold sticker in its background */
+        background-color: rgba(255, 215, 0, 0.81);
+        border: gold 2px solid;
+        border-radius: 6px;
     }
 
 </style>

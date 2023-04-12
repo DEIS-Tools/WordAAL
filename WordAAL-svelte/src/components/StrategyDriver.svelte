@@ -16,6 +16,8 @@
         sureLettersStore,
         globalCountsStore,
         hideProposalsStore,
+        gameInProgress,
+        winTrigger,
     } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
@@ -29,7 +31,7 @@
     let strategyJSON = [];
     let strategy;
     let mode;
-    let staticPath = "static/strategies/";
+    let staticPath = "strategies/";
 
     let knowledge_html;
 
@@ -523,7 +525,8 @@
         // allow for updating if only one hand-written guess has been made so-far, as driver can only cope with one
         if ($responseHistoryStore.length > 0 && ($hideProposalsStore === false || responseHistoryStore.length < 2)) {
             // if last response is "00000", do not update strategy
-            if ($responseHistoryStore[$responseHistoryStore.length - 1].map((x) => x[0]).join("") !== "00000") {
+            if (!$winTrigger) {
+                gameInProgress.set(true); //todo: use to disallow breaking changes
                 asyncUpdateStrategy();
             }
         }

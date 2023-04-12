@@ -13,12 +13,12 @@
     import Button from "@smui/button";
     import Textfield from "@smui/textfield";
     import AutoComplete from "simple-svelte-autocomplete"
-    import {Text} from '@smui/list';
-    import CircularProgress from '@smui/circular-progress';
 
     onMount(() => {
         randomTargetWord();
     });
+
+    let selectedTargetWord: string = "";
 
     function randomTargetWord() {
         let onlyCurated = true;
@@ -34,25 +34,19 @@
         let chars = WORDS[index];
 
         //fixme: DEBUG hardcoding target for testing
-        /*
         target = "bidet"; //hardcode target word
         chars = convertStringToCharArray(target)
         index = WORDS_STRINGIFIED.indexOf(target);
         console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
-         */
 
         targetWordStore.set({cleartext: target, index: index, chars: chars});
     }
 
-    //fixme: rewrite to update store statement
-    $: {
-        if ($newGameTrigger) {
-            randomTargetWord();
-            newGameTrigger.set(false);
-        }
+    $:{
+        // when targetWordStore changes, log it
+        console.log("target word changed to", $targetWordStore.cleartext);
     }
 
-    let selectedTargetWord: string = "";
 
     // when selectedTargetWord changes, find its index in WORDS and set targetWordStore accordingly
     $: {
@@ -60,21 +54,26 @@
             let index = WORDS_STRINGIFIED.indexOf(selectedTargetWord);
             let chars = convertStringToCharArray(selectedTargetWord);
             targetWordStore.set({cleartext: selectedTargetWord, index: index, chars: chars});
-            console.log($targetWordStore);
         }
     }
 
+    //fixme: rewrite to update store statement
+    $: {
+        if ($newGameTrigger) {
+            randomTargetWord();
+        }
+    }
 
 </script>
 
 <div class="wordPicker">
     <Button variant="raised" on:click={randomTargetWord}>Pick random target word</Button>
     <div class="targetWord">
-        <Textfield variant="filled" bind:value={$targetWordStore['cleartext']} label="Word to guess"/>
+        <Textfield variant="filled" bind:value={$targetWordStore.cleartext} label="Word to guess"/>
     </div>
-    <div class="targetWord">
+    <div>
         <AutoComplete items="{WORDS_STRINGIFIED}" bind:selectedItem="{selectedTargetWord}"
-                      placeholder="Choose word from wordlist" hideArrow="true" maxItemsToShowInList="5"/>
+                      placeholder="Choose word from wordlist" hideArrow="true" maxItemsToShowInList="5" showClear="true"/>
 
     </div>
 
@@ -91,7 +90,7 @@
         -o-transition: all 0.5s ease;
         -ms-transition: all 0.5s ease;
         transition: all 0.5s ease;
-        /*filter: blur(5px);*/
+        filter: blur(5px);
 
     }
 

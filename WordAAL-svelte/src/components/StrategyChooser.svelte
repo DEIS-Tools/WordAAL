@@ -4,6 +4,7 @@
     import {Label} from '@smui/common';
     import Switch from '@smui/switch';
     import FormField from '@smui/form-field';
+    import Tooltip, { Wrapper } from '@smui/tooltip';
 
 
     let availableStrats = [
@@ -51,9 +52,14 @@
     <div class="strategies">
         <p>Strategy:&nbsp;</p>
         <SegmentedButton segments={availableStrats} let:segment singleSelect bind:selected={strategy}>
+            <Wrapper>
             <Segment {segment} touch title={segment.name}>
                 <Label>{segment.name}</Label>
             </Segment>
+                <Tooltip>
+                    {segment.desc}
+                </Tooltip>
+            </Wrapper>
         </SegmentedButton>
         <p>&nbsp;Hard-mode:&nbsp;</p>
         <FormField>

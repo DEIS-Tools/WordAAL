@@ -4,17 +4,21 @@
         guessSubmitTrigger,
         newGameTrigger,
         proposalsStore,
-        hideProposalsStore
+        hideProposalsStore,
+        winTrigger
     } from "../stores/stores.js";
     import Key from "./Key.svelte";
     import {fly, fade} from 'svelte/transition';
     import CircularProgress from '@smui/circular-progress';
     import Chip, {Set, Text, TrailingIcon} from '@smui/chips';
+    import Card, {Content} from '@smui/card';
 
-    import {NUM_PROPOSALS} from "../lib/Consts.svelte"
+
+    import {NUM_PROPOSALS, NPOS} from "../lib/Consts.svelte"
 
     let loading = true;
     let proposals = [];
+    const dontKnow = [[' ', ' ', ' ', ' ', ' ']];
 
     $: {
         // when new game is triggered, clear the proposals
@@ -59,22 +63,71 @@
     }
 </script>
 
-<div class={$hideProposalsStore ? "proposal-box-blur" : "proposal-box"} transition:fly={{x:100, duration: 500}}>
-    {#if loading}
-        <div class="loading" in:fade={{x:100, duration: 500}}>
-            <CircularProgress style="height: 80px; width: 80px;" indeterminate/>
-            Loading proposals...
+{#if !$winTrigger}
+    {#if proposals.length > 0}
+        <div class="proposal-box" class:blur={$hideProposalsStore} transition:fly={{x:100, duration: 500}}>
+            {#if loading}
+                <div class="loading" in:fade={{x:100, duration: 500}}>
+                    <CircularProgress style="height: 80px; width: 80px;" indeterminate/>
+                    Loading proposals...
+                </div>
+            {:else}
+                <div in:fade={{duration:500}}>
+                    {#each proposals as proposal}
+                        <div class="proposal" on:click={() => {propose(proposal.word)}}>
+                            {#each proposal.word as letter, letterIndex}
+                                <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
+                            {/each}
+                            <Set chips={['1']} let:chip nonInteractive>
+                                <Chip {chip}>
+                                    <Text><p class="cost" style:color={costShade(proposal.cost)}>
+                                        &nbsp;{proposal.cost.toFixed(3)}
+                                        &nbsp;</p>
+                                    </Text>
+                                    <TrailingIcon class="material-icons">payments</TrailingIcon>
+                                </Chip>
+                            </Set>
+                        </div>
+                    {/each}
+                </div>
+            {/if}
         </div>
     {:else}
-        <div in:fade={{duration:500}}>
+        <div class="proposal-box noMoreProposals">
+            {#each dontKnow as proposal}
+                <div class="proposal">
+                    {#each Array(NPOS) as letter, i}
+                        <Key value="{proposal[i].toUpperCase()}" state="2"/>
+                    {/each}
+                    <Set chips={['1']} let:chip nonInteractive>
+                        <Chip {chip}>
+                            <Text><p class="cost" style:color="rgb(255, 255, 255)">
+                                &nbsp;??.???
+                                &nbsp;</p>
+                            </Text>
+                            <TrailingIcon class="material-icons">payments</TrailingIcon>
+                        </Chip>
+                    </Set>
+                </div>
+            {/each}
+
+            <div class="noMoreProposalsCard">
+                <Card padded>Don't know any more proposals</Card>
+            </div>
+        </div>
+    {/if}
+
+{:else}
+    <div class="proposal-box fade" class:blur={$hideProposalsStore} in:fade={{duration:500}}>
         {#each proposals as proposal}
-            <div class="proposal" on:click={() => {propose(proposal.word)}}>
+            <div class="proposal">
                 {#each proposal.word as letter, letterIndex}
                     <Key value={letter.toUpperCase()} state={proposal.knowledge[letterIndex]}/>
                 {/each}
                 <Set chips={['1']} let:chip nonInteractive>
                     <Chip {chip}>
-                        <Text><p class="cost" style:color={costShade(proposal.cost)}> &nbsp;{proposal.cost.toFixed(3)}
+                        <Text><p class="cost" style:color={costShade(proposal.cost)}>
+                            &nbsp;{proposal.cost.toFixed(3)}
                             &nbsp;</p>
                         </Text>
                         <TrailingIcon class="material-icons">payments</TrailingIcon>
@@ -82,9 +135,8 @@
                 </Set>
             </div>
         {/each}
-        </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 
 <style>
@@ -121,9 +173,7 @@
         flex-direction: column;
     }
 
-    .proposal-box-blur {
-        display: flex;
-        flex-direction: column;
+    .blur {
         -webkit-transition: all 0.5s ease;
         -moz-transition: all 0.5s ease;
         -o-transition: all 0.5s ease;
@@ -133,4 +183,13 @@
         pointer-events: none;
     }
 
+    .fade {
+        -webkit-transition: all 0.5s ease;
+        -moz-transition: all 0.5s ease;
+        -o-transition: all 0.5s ease;
+        -ms-transition: all 0.5s ease;
+        transition: all 0.5s ease;
+        opacity: 0.5;
+        pointer-events: none;
+    }
 </style>

@@ -13,6 +13,7 @@
         newGameTrigger,
         guessSubmitTrigger,
         winTrigger,
+        gameInProgress,
     } from "../stores/stores.js";
 
     import {onMount} from "svelte";
@@ -40,6 +41,8 @@
         responseStore.set([]);
         responseHistoryStore.set([]);
         newGameTrigger.set(true);
+        winTrigger.set(false);
+        gameInProgress.set(false);
     }
 
     export function wordleResponse() {
@@ -129,17 +132,17 @@
                 winTrigger.set(true);
                 successText = `You've won in ${$responseHistoryStore.length} guesses!`;
                 snackbarSuccess.open();
-                setTimeout(() => {
+/*                setTimeout(() => {
                     resetGame();
-                }, 10000);
+                }, 10000);*/
             } else if ($responseHistoryStore.length >= MAX_N_GUESSES) {
                 warningText = `You've lost! The word was ${$targetWordStore['cleartext'].toUpperCase()}`;
                 snackbarWarning.open();
                 $guessStore = $targetWordStore['cleartext'];
                 //todo; make modal which shows word and has button to start new game, also show prefilled target word distinct and in green
-                setTimeout(() => {
+/*                setTimeout(() => {
                     resetGame();
-                }, 10000);
+                }, 10000);*/
             }
         }
     }
