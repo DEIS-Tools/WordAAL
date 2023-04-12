@@ -5,22 +5,24 @@
     import Switch from "@smui/switch";
 
     import {hideProposalsStore} from "../stores/stores.js";
-
-    let hideProposals = false;
-
-    $: hideProposalsStore.set(hideProposals);
 </script>
 
-
+<div class="option-row">
+    <StrategyChooser/>
+    <FormField>
+        <p>Blur proposals:</p>
+        <Switch bind:checked={$hideProposalsStore} touch/>
+    </FormField>
+</div>
 <WordPicker/>
-<StrategyChooser/>
 
-<FormField>
-    <p>Blur proposals:</p>
-    <Switch bind:checked={hideProposals} touch/>
-</FormField>
-
-
-<style lang="scss">
+<style>
+    .option-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: left;
+        align-items: center;
+        border-radius: 5px;
+    }
 
 </style>

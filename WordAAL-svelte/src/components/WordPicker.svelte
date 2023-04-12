@@ -1,11 +1,18 @@
 <script type="module" lang="ts">
-    import {WORDS, INDEX_LAST_CURATED_WORD, NPOS, convertStringToCharArray} from '../lib/Consts.svelte';
+    import {
+        WORDS,
+        WORDS_STRINGIFIED,
+        INDEX_LAST_CURATED_WORD,
+        NPOS,
+        convertStringToCharArray,
+        convertCharArrayToString
+    } from '../lib/Consts.svelte';
 
     import {newGameTrigger, targetWordStore} from "../stores/stores.js";
     import {onMount} from "svelte";
     import Button from "@smui/button";
     import Textfield from "@smui/textfield";
-    import Autocomplete from '@smui-extra/autocomplete';
+    import AutoComplete from "simple-svelte-autocomplete"
     import {Text} from '@smui/list';
     import CircularProgress from '@smui/circular-progress';
 
@@ -26,11 +33,13 @@
         target = target.join('');
         let chars = WORDS[index];
 
-        // DEBUG
-        target = "meter"; //hardcode target word
+        //fixme: DEBUG hardcoding target for testing
+        /*
+        target = "bidet"; //hardcode target word
         chars = convertStringToCharArray(target)
-        index = 1225;
+        index = WORDS_STRINGIFIED.indexOf(target);
         console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
+         */
 
         targetWordStore.set({cleartext: target, index: index, chars: chars});
     }
@@ -43,44 +52,18 @@
         }
     }
 
-    // todo; implement fuzzy autocomplete search in wordlist
-    /*
-        let counter = 0;
-
-        async function searchItems(input: string) {
-            if (input === '') {
-                return [];
-            }
-
-            // Pretend to have some sort of canceling mechanism.
-            const myCounter = ++counter;
-
-            // Pretend to be loading something...
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // This means the function was called again, so we should cancel.
-            if (myCounter !== counter) {
-                // `return false` (or, more accurately, resolving the Promise object to
-                // `false`) is how you tell Autocomplete to cancel this search. It won't
-                // replace the results of any subsequent search that has already finished.
-                return false;
-            }
-
-
-            // Return a list of matches.
-            return WORDS.filter((item) =>
-                item.toLowerCase().includes(input.toLowerCase())
-            );
-        }
-
-        let value: string | undefined = undefined;
-
-
-    */
-
     let selectedTargetWord: string = "";
 
-    let words = ["apple", "cedar", "meter"];
+    // when selectedTargetWord changes, find its index in WORDS and set targetWordStore accordingly
+    $: {
+        if (selectedTargetWord !== "") {
+            let index = WORDS_STRINGIFIED.indexOf(selectedTargetWord);
+            let chars = convertStringToCharArray(selectedTargetWord);
+            targetWordStore.set({cleartext: selectedTargetWord, index: index, chars: chars});
+            console.log($targetWordStore);
+        }
+    }
+
 
 </script>
 
@@ -90,24 +73,11 @@
         <Textfield variant="filled" bind:value={$targetWordStore['cleartext']} label="Word to guess"/>
     </div>
     <div class="targetWord">
-        <Autocomplete options={words} bind:value={selectedTargetWord} label="Choose word from wordlist"/>
+        <AutoComplete items="{WORDS_STRINGIFIED}" bind:selectedItem="{selectedTargetWord}"
+                      placeholder="Choose word from wordlist" hideArrow="true" maxItemsToShowInList="5"/>
+
     </div>
-    <!--<div>
-        <Autocomplete
-                search={searchItems}
-                bind:value
-                showMenuWithNoInput={false}
-                label="Choose word from wordlist"
-        >
-            <Text
-                    slot="loading"
-                    style="display: flex; width: 100%; justify-content: center; align-items: center;"
-            >
-                <CircularProgress style="height: 24px; width: 24px;" indeterminate/>
-            </Text>
-        </Autocomplete>
-        <pre class="status">Selected: {value || ''}</pre>
-    </div>-->
+
 </div>
 
 <style>

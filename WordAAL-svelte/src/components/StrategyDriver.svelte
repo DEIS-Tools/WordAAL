@@ -376,6 +376,7 @@
         sureLettersStore.set(sureLetters);
         globalCountsStore.set(globalCounts);
         showWords();
+        return true;
     }
 
     function lookup(regressor) {
@@ -427,7 +428,7 @@
 
     function showWords() {
         let best = bestAction();
-        let res = [];
+        let proposals = [];
         const correctLetters = sureLetters.reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
         }, {});
@@ -470,16 +471,10 @@
                     word['cost'] = cst;
                 }
             }
-            res.push(word);
+            proposals.push(word);
         }
 
-        if (best !== Infinity) {
-            res.sort((a, b) => {
-                return a.cost - b.cost;
-            });
-        }
-
-        proposalsStore.set(res.sort((a, b) => {
+        proposalsStore.set(proposals.sort((a, b) => {
             return a.cost - b.cost;
         }));
     }
@@ -527,7 +522,10 @@
     $: {
         // allow for updating if only one hand-written guess has been made so-far, as driver can only cope with one
         if ($responseHistoryStore.length > 0 && ($hideProposalsStore === false || responseHistoryStore.length < 2)) {
-            asyncUpdateStrategy();
+            // if last response is "00000", do not update strategy
+            if ($responseHistoryStore[$responseHistoryStore.length - 1].map((x) => x[0]).join("") !== "00000") {
+                asyncUpdateStrategy();
+            }
         }
     }
 

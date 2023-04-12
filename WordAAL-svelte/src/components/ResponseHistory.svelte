@@ -6,6 +6,7 @@
         sureLettersStore,
         globalCountsStore,
         knowledgeStore,
+        winTrigger,
     } from '../stores/stores.js';
     import Key from "./Key.svelte";
     import {fly} from "svelte/transition";
@@ -79,6 +80,7 @@
             {/each}
         {/if}
     {/if}
+    {#if !$winTrigger}
     <div class="historyEntry">
         <div style="align-items: center">
             &nbsp; {$responseHistoryStore.length + 1} &nbsp;
@@ -87,6 +89,7 @@
             <Key value={guess.toUpperCase()} state={knowledge[idxLetter]}/>
         {/each}
     </div>
+    {/if}
 </div>
 
 <style>

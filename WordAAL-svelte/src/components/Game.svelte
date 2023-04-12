@@ -12,12 +12,12 @@
         targetWordStore,
         newGameTrigger,
         guessSubmitTrigger,
+        winTrigger,
     } from "../stores/stores.js";
 
     import {onMount} from "svelte";
 
     import Snackbar, {Label} from '@smui/snackbar';
-    import Button from '@smui/button';
 
     let snackbarSuccess: Snackbar;
     let snackbarWarning: Snackbar;
@@ -126,11 +126,12 @@
             // guess is legal, calc response and check for win condition
             wordleResponse();
             if ($responseHistoryStore.length >= 1 && $responseStore.every((x) => x[1] === 0)) {
+                winTrigger.set(true);
                 successText = `You've won in ${$responseHistoryStore.length} guesses!`;
                 snackbarSuccess.open();
                 setTimeout(() => {
                     resetGame();
-                }, 5000);
+                }, 10000);
             } else if ($responseHistoryStore.length >= MAX_N_GUESSES) {
                 warningText = `You've lost! The word was ${$targetWordStore['cleartext'].toUpperCase()}`;
                 snackbarWarning.open();
@@ -138,7 +139,7 @@
                 //todo; make modal which shows word and has button to start new game, also show prefilled target word distinct and in green
                 setTimeout(() => {
                     resetGame();
-                }, 5000);
+                }, 10000);
             }
         }
     }

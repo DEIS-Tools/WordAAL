@@ -14,7 +14,7 @@ export const guessStore = writable("");
 
 export const proposalsStore = writable();
 export const hideProposalsStore = writable(false);
-
+export const winTrigger = writable(false);
 export const newGameTrigger = writable(false);
 export const guessSubmitTrigger = writable(false);
 

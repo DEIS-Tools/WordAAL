@@ -25,12 +25,32 @@
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
     import StrategyDriver from "./components/StrategyDriver.svelte";
-    import {guessStore, guessSubmitTrigger, targetWordStore} from "./stores/stores"
+    import {guessStore, guessSubmitTrigger, targetWordStore, winTrigger} from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
+
+    import {Fireworks} from 'fireworks-js'
+
+    let fireworks;
+
+    setTimeout(() => {
+        const container = document.querySelector("#firework")
+        console.warn("container", container);
+        fireworks = new Fireworks(container, {
+            acceleration: 1.01,
+            intensity: 50,
+            opacity: 0.8,
+        });
+    }, 1000);
+
+    winTrigger.subscribe((win) => {
+        if (win) {
+            fireworks.launch(10);
+        }
+    })
 
 
     const onWordleKeyDown = (event) => {
@@ -79,6 +99,8 @@
 </script>
 
 <main>
+    <div id="firework"></div>
+
     <div class="logo">
         {#each wordaalLogo as k, i}
             <Key {...k} clickable="true"/>
@@ -119,6 +141,7 @@
         border-radius: 10px;
         padding: 32px 16px;
         overflow: hidden; /* will contain if #first is longer than #second */
+        min-width: 850px;
     }
 
     .left {
@@ -135,5 +158,15 @@
         padding: 10px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
         min-width: 450px;
+    }
+
+    #firework {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        pointer-events: none;
     }
 </style>
