@@ -434,16 +434,20 @@
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
         }, {});
 
+        // get wordWids for all words in responseHistory
+        let responseHistoryWids = [];
+        for (let i = 0; i < $responseHistoryStore.length; i++) {
+            let guess = $responseHistoryStore[i].map((x) => x[0]).join("");
+            let num_guess = convertStringToCharArray(guess);
+            responseHistoryWids.push(wordWid(num_guess));
+        }
+
         for (let wid = 0; wid < NWORDS; ++wid) {
             let word = {wid: wid, word: "", knowledge: [2, 2, 2, 2, 2], cost: Infinity};
 
             // if word is in any responseHistory, then skip
-            for (let i = 0; i < $responseHistoryStore.length; i++) {
-                let guess = $responseHistoryStore[i].map((x) => x[0]).join("");
-                let num_guess = convertStringToCharArray(guess);
-                if (wordWid(num_guess) === wid) {
-                    break;
-                }
+            if (responseHistoryWids.includes(wid)) {
+                continue;
             }
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
                 // for NPOS; for NLETTER, if knowledge[p][l] is 1, then correct and put knowledge 0 to word
