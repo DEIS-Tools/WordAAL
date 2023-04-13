@@ -1,20 +1,9 @@
 <script>
-    import {
-        blur,
-        crossfade,
-        draw,
-        fade,
-        fly,
-        scale,
-        slide,
-    } from 'svelte/transition';
     export let value = " "
     // 0 = green, 1 = yellow, 2 = grey
     const states = [0, 1, 2];
     export let state = 0;
-
     export let clickable = false;
-
     function cycleColorsOnClick() {
         if (clickable) {
             console.log("changing key: " + value + " to " + state)
@@ -23,7 +12,7 @@
     }
 </script>
 
-
+<!--fixme: css selector should be done with svelte class:$css-class={expr}-->
 <button class="button-{state}" on:click={cycleColorsOnClick}>
     {value}
 </button>

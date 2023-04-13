@@ -7,18 +7,19 @@
         hideProposalsStore,
         winTrigger
     } from "../stores/stores.js";
+    import {NUM_PROPOSALS, NPOS} from "../lib/Consts.svelte"
     import Key from "./Key.svelte";
     import {fly, fade} from 'svelte/transition';
     import CircularProgress from '@smui/circular-progress';
     import Chip, {Set, Text, TrailingIcon} from '@smui/chips';
-    import Card, {Content} from '@smui/card';
+    import Card from '@smui/card';
 
-
-    import {NUM_PROPOSALS, NPOS} from "../lib/Consts.svelte"
 
     let loading = true;
     let proposals = [];
     const dontKnow = [[' ', ' ', ' ', ' ', ' ']];
+    let firstLoad = true;
+
 
     $: {
         // when new game is triggered, clear the proposals
@@ -51,6 +52,7 @@
         if (Array.isArray(p)) {
             proposals = p.filter(proposal => proposal.cost !== Infinity).slice(0, NUM_PROPOSALS);
             loading = false;
+            firstLoad = false;
         }
     }
 
@@ -92,7 +94,7 @@
                 </div>
             {/if}
         </div>
-    {:else}
+    {:else if (!firstLoad)}
         <div class="proposal-box noMoreProposals">
             {#each dontKnow as proposal}
                 <div class="proposal">
@@ -112,7 +114,8 @@
             {/each}
 
             <div class="noMoreProposalsCard">
-                <Card padded>Don't know any more proposals</Card>
+                <Card padded>Strategy has no more proposals.<br/>
+                    You can continue guessing with your own guesses!</Card>
             </div>
         </div>
     {/if}

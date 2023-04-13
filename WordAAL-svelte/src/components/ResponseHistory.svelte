@@ -6,11 +6,10 @@
         sureLettersStore,
         globalCountsStore,
         knowledgeStore,
-        winTrigger, targetWordStore,
+        winTrigger,
     } from '../stores/stores.js';
     import Key from "./Key.svelte";
     import {fly} from "svelte/transition";
-    import Response from "./StrategyDriver.svelte"
     import {NPOS, ASCII_OFFSET} from "../lib/Consts.svelte"
 
     const fiveSpaces = [];

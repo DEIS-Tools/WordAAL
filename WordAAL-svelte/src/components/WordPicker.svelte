@@ -5,7 +5,6 @@
         INDEX_LAST_CURATED_WORD,
         NPOS,
         convertStringToCharArray,
-        convertCharArrayToString
     } from '../lib/Consts.svelte';
 
     import {newGameTrigger, targetWordStore} from "../stores/stores.js";
@@ -34,10 +33,10 @@
         let chars = WORDS[index];
 
         //fixme: DEBUG hardcoding target for testing
-        target = "bidet"; //hardcode target word
+        /*target = "bidet"; //hardcode target word
         chars = convertStringToCharArray(target)
         index = WORDS_STRINGIFIED.indexOf(target);
-        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
+        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");*/
 
         targetWordStore.set({cleartext: target, index: index, chars: chars});
     }

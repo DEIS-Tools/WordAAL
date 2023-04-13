@@ -16,8 +16,6 @@
         gameInProgress,
     } from "../stores/stores.js";
 
-    import {onMount} from "svelte";
-
     import Snackbar, {Label} from '@smui/snackbar';
 
     let snackbarSuccess: Snackbar;
@@ -27,13 +25,6 @@
     let successText: string = "DEFAULT SUCCESS TEXT";
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
-
-
-    onMount(() => {
-        console.log("onMount game");
-        //guessStore.set("cedar");
-    });
-
 
     export function resetGame() {
         console.warn("resetGame");

@@ -11,17 +11,10 @@
             rel="stylesheet"
             href="https://fonts.googleapis.com/css?family=Roboto+Mono"
     />
-    <link rel="stylesheet" href="node_modules/svelte-material-ui/bare.css"/>
-    <!-- SMUI Styles -->
     <link
             rel="stylesheet"
-            href="node_modules/svelte-material-ui/themes/svelte.css"
-            media="(prefers-color-scheme: light)"
+            href="https://cdn.jsdelivr.net/npm/svelte-material-ui@6.0.0/bare.min.css"
     />
-
-    <!-- SMUI Styles -->
-    <link rel="stylesheet" href="/smui.css" />
-
 </svelte:head>
 
 <script>

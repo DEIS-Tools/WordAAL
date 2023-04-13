@@ -1,5 +1,5 @@
 import {writable} from 'svelte/store';
-import {NLETTER, NPOS, WORDS, INDEX_LAST_CURATED_WORD} from '../lib/Consts.svelte';
+import {NLETTER, NPOS} from '../lib/Consts.svelte';
 
 
 export const targetWordStore = writable({cleartext: "", index: 0, chars: [0, 0, 0, 0, 0]});

@@ -99,7 +99,7 @@
 
         loadStrategoStrategyJSON(staticPath);
         // reset path for reload of another strategy
-        staticPath = "static/strategies/";
+        staticPath = "strategies/";
 
         // map strat to legacy; comb=2 || cons=0 || perm=1
         if (store.s.name === "conservative") {
@@ -385,7 +385,6 @@
         if (typeof (regressor) === 'object') {
             let pv = strategyJSON["pointvars"][regressor["var"]].substring(5);
             let val = eval(pv); //fixme: jank lookup, might be similar to strategy_lookup fix
-            let k = regressor["var"];
             if (val <= regressor["bound"])
                 return lookup(regressor["low"]);
             else
