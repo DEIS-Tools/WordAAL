@@ -61,7 +61,7 @@
         setTimeout(() => {
             guessStore.set(guess);
             guessSubmitTrigger.set(true);
-        }, 100);
+        }, 750);
     }
 </script>
 
@@ -96,26 +96,29 @@
         </div>
     {:else if (!firstLoad)}
         <div class="proposal-box noMoreProposals">
-            {#each dontKnow as proposal}
-                <div class="proposal">
-                    {#each Array(NPOS) as letter, i}
-                        <Key value="{proposal[i].toUpperCase()}" state="2"/>
-                    {/each}
-                    <Set chips={['1']} let:chip nonInteractive>
-                        <Chip {chip}>
-                            <Text><p class="cost" style:color="rgb(255, 255, 255)">
-                                &nbsp;??.???
-                                &nbsp;</p>
-                            </Text>
-                            <TrailingIcon class="material-icons">payments</TrailingIcon>
-                        </Chip>
-                    </Set>
-                </div>
-            {/each}
+            <div class="fade">
+                {#each dontKnow as proposal}
+                    <div class="proposal">
+                        {#each Array(NPOS) as letter, i}
+                            <Key value="{proposal[i].toUpperCase()}" state="2"/>
+                        {/each}
+                        <Set chips={['1']} let:chip nonInteractive>
+                            <Chip {chip}>
+                                <Text><p class="cost" style:color="rgb(255, 255, 255)">
+                                    &nbsp;??.???
+                                    &nbsp;</p>
+                                </Text>
+                                <TrailingIcon class="material-icons">payments</TrailingIcon>
+                            </Chip>
+                        </Set>
+                    </div>
+                {/each}
+            </div>
 
             <div class="noMoreProposalsCard">
                 <Card padded>Strategy has no more proposals.<br/>
-                    You can continue guessing with your own guesses!</Card>
+                    You can continue guessing with your own guesses!
+                </Card>
             </div>
         </div>
     {/if}
