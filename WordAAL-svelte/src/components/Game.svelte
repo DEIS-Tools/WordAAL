@@ -14,9 +14,19 @@
         guessSubmitTrigger,
         winTrigger,
         gameInProgress,
+        lossTrigger,
     } from "../stores/stores.js";
 
     import Snackbar, {Label} from '@smui/snackbar';
+    import Dialog, {Title, Content, Actions, InitialFocus} from '@smui/dialog';
+    import Button from '@smui/button';
+    import {Fireworks} from 'fireworks-js'
+
+
+    let fireworks;
+
+
+    let gameEndDialogOpen = false;
 
     let snackbarSuccess: Snackbar;
     let snackbarWarning: Snackbar;
@@ -26,15 +36,17 @@
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
 
-    export function resetGame() {
-        console.warn("resetGame");
-        guessStore.set("");
-        responseStore.set([]);
-        responseHistoryStore.set([]);
-        newGameTrigger.set(true);
-        winTrigger.set(false);
-        gameInProgress.set(false);
-    }
+    /*    export function resetGame() {
+            setTimeout(() => {
+                console.warn("resetting game");
+                guessStore.set("");
+                responseStore.set([]);
+                responseHistoryStore.set([]);
+                newGameTrigger.set(true);
+                winTrigger.set(false);
+                gameInProgress.set(false);
+            }, 1000);
+        }*/
 
     export function wordleResponse() {
         if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {
@@ -123,17 +135,17 @@
                 winTrigger.set(true);
                 successText = `You've won in ${$responseHistoryStore.length} guesses!`;
                 snackbarSuccess.open();
-/*                setTimeout(() => {
-                    resetGame();
-                }, 10000);*/
+                setTimeout(() => {
+                    gameEndDialogOpen = true;
+                }, 2000);
             } else if ($responseHistoryStore.length >= MAX_N_GUESSES) {
+                lossTrigger.set(true);
                 warningText = `You've lost! The word was ${$targetWordStore['cleartext'].toUpperCase()}`;
                 snackbarWarning.open();
                 $guessStore = $targetWordStore['cleartext'];
-                //todo; make modal which shows word and has button to start new game, also show prefilled target word distinct and in green
-/*                setTimeout(() => {
-                    resetGame();
-                }, 10000);*/
+                setTimeout(() => {
+                    gameEndDialogOpen = true;
+                }, 2000);
             }
         }
     }
@@ -148,13 +160,32 @@
         });
     }
 
+    setTimeout(() => {
+        const container = document.querySelector("#firework")
+        fireworks = new Fireworks(container, {
+            acceleration: 1.01,
+            intensity: 50,
+            opacity: 0.8,
+        });
+    }, 200);
+
+    winTrigger.subscribe((win) => {
+        if (win) {
+            fireworks.launch(10);
+            let interval = setInterval(() => {
+                fireworks.launch(5);
+            }, 500);
+            setTimeout(() => {
+                clearInterval(interval)
+            }, 2000)
+        }
+    })
+
 
 </script>
 
 
 <ResponseHistory/>
-<!--<Textfield class="guess" variant="outlined" bind:value={$guessStore} label="Guess" on:keypress={handleGuessInput}
-           input$maxlength={NPOS} autofocus/>-->
 
 <Snackbar bind:this={snackbarSuccess} class="success">
     <Label>{successText}</Label>
@@ -167,19 +198,34 @@
 <Snackbar bind:this={snackbarError} class="error">
     <Label>{errorText}</Label>
 </Snackbar>
-<!-- DEBUG opening of snackbars
-<Button on:click={() => snackbarSuccess && snackbarSuccess.open()}>
-    <Label>Success</Label>
-</Button>
 
-<Button on:click={() => snackbarWarning && snackbarWarning.open()}>
-    <Label>Warning</Label>
-</Button>
 
-<Button on:click={() => snackbarError && snackbarError.open()}>
-    <Label>Error</Label>
-</Button>-->
-
+<Dialog
+        bind:open={gameEndDialogOpen}
+        aria-labelledby="gameEndDialogTitle"
+        aria-describedby="gameEndDialogContent"
+>
+    <Title id="gameEndDialogTitle">End of game</Title>
+    <Content id="gameEndDialogContent">
+        {#if $winTrigger}
+            You have won! 🎉
+        {:else if $lossTrigger}
+            You have lost! ☹️
+        {/if}
+        <br/><br/>
+        Start a new game or continue looking at current game?
+    </Content>
+    <Actions>
+        <Button defaultAction
+                use={[InitialFocus]}
+                on:click={() => (location.reload())}>
+            <Label>New game</Label>
+        </Button>
+        <Button>
+            <Label>Dismiss</Label>
+        </Button>
+    </Actions>
+</Dialog>
 <style lang="scss">
   .box {
     display: flex;

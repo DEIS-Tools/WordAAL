@@ -6,7 +6,8 @@
         sureLettersStore,
         globalCountsStore,
         knowledgeStore,
-        winTrigger,
+        winTrigger, lossTrigger,
+        targetWordStore,
     } from '../stores/stores.js';
     import Key from "./Key.svelte";
     import {fly} from "svelte/transition";
@@ -79,9 +80,21 @@
                     {/each}
                 </div>
             {/each}
+            {#if $lossTrigger}
+                <div class="historyEntry losing"
+                     in:fly={{x:-100, duration: 500}}>
+                    <div style="align-items: center">
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <!--fixme; better inset and with css instead-->
+                    </div>
+                    {#each $targetWordStore.cleartext as guess}
+                        <Key value={guess.toUpperCase()}
+                             state={0}/>
+                    {/each}
+                </div>
+            {/if}
         {/if}
     {/if}
-    {#if !$winTrigger}
+    {#if !$winTrigger && !$lossTrigger}
         <div class="historyEntry">
             <div style="align-items: center">
                 &nbsp; {$responseHistoryStore.length + 1} &nbsp;
@@ -94,7 +107,6 @@
 </div>
 
 <style>
-
     .history {
         display: flex;
         flex-direction: column;
@@ -120,6 +132,13 @@
         /*make winning entry look like a gold sticker in its background */
         background-color: rgba(255, 215, 0, 0.81);
         border: gold 2px solid;
+        border-radius: 6px;
+    }
+
+    .losing {
+        /*make losing entry look like a red sticker in its background */
+        background-color: rgba(255, 0, 0, 0.40);
+        border: red 2px solid;
         border-radius: 6px;
     }
 

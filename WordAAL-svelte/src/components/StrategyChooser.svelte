@@ -61,7 +61,7 @@
                 </Tooltip>
             </Wrapper>
         </SegmentedButton>
-        <p>&nbsp;Hard-mode:&nbsp;</p>
+        <p>&nbsp;Hard-mode:</p>
         <FormField>
             <Switch bind:checked={hard} touch/>
         </FormField>

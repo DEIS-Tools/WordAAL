@@ -18,6 +18,7 @@
         hideProposalsStore,
         gameInProgress,
         winTrigger,
+        lossTrigger,
     } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
@@ -528,7 +529,7 @@
         // allow for updating if only one hand-written guess has been made so-far, as driver can only cope with one
         if ($responseHistoryStore.length > 0 && ($hideProposalsStore === false || responseHistoryStore.length < 2)) {
             // if last response is "00000", do not update strategy
-            if (!$winTrigger) {
+            if (!$winTrigger || !$lossTrigger) {
                 gameInProgress.set(true); //todo: use to disallow breaking changes
                 asyncUpdateStrategy();
             }
