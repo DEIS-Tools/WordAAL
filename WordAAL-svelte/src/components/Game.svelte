@@ -11,10 +11,8 @@
         responseStore,
         responseHistoryStore,
         targetWordStore,
-        newGameTrigger,
         guessSubmitTrigger,
         winTrigger,
-        gameInProgress,
         lossTrigger,
     } from "../stores/stores.js";
 

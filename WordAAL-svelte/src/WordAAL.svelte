@@ -21,7 +21,7 @@
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
     import StrategyDriver from "./components/StrategyDriver.svelte";
-    import {guessStore, guessSubmitTrigger, targetWordStore, winTrigger} from "./stores/stores"
+    import {guessStore, guessSubmitTrigger, targetWordStore} from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
