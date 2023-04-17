@@ -13,6 +13,7 @@
     import CircularProgress from '@smui/circular-progress';
     import Chip, {Set, Text, TrailingIcon} from '@smui/chips';
     import Card from '@smui/card';
+    import Button from "@smui/button";
 
 
     let loading = true;
@@ -118,6 +119,9 @@
             <div class="noMoreProposalsCard">
                 <Card padded>Strategy has no more proposals.<br/>
                     You can continue guessing with your own guesses!
+                    <Button on:click={() => (location.reload())}>
+                        New game
+                    </Button>
                 </Card>
             </div>
         </div>
