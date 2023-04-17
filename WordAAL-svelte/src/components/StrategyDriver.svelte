@@ -456,8 +456,10 @@
                 for (let n = 0; n < NPOS; n++) {
                     let char = WORDS[wid][n];
 
-                    // if counts for current letter is positive and is not known sure letter, mark knowledge as maybe
+                    // if counts for current letter is positive and is not known sure letter, then set knowledge to 1
+
                     if (globalCounts[char] > (correctLetters[char] || 0)) {
+                        // FIXME only do this for the number of times the letter appears in the target word
                         word["knowledge"][n] = 1;
                     }
 

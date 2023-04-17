@@ -2,7 +2,8 @@
     import {
         NPOS,
         MAX_N_GUESSES,
-        wordInWordlist
+        wordInWordlist,
+        NLETTER
     } from "../lib/Consts.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
     import {
@@ -36,15 +37,15 @@
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
 
-    /*    export function resetGame() {
+/*        export function resetGame() {
             setTimeout(() => {
-                console.warn("resetting game");
+                conso;le.warn("resetting game");
                 guessStore.set("");
                 responseStore.set([]);
                 responseHistoryStore.set([]);
                 newGameTrigger.set(true);
                 winTrigger.set(false);
-                gameInProgress.set(false);
+                gameInProgress.set(false)
             }, 1000);
         }*/
 
@@ -53,14 +54,36 @@
             console.error("wordleResponse: targetWord or guess is undefined or guess is not NPOS long")
             return;
         }
-        const correctLetters = new Set($targetWordStore['cleartext']);
+
+        const correctLetters = $targetWordStore['cleartext'];
+        console.log("correctLetters", correctLetters);
         let res = [['a', -1], ['a', -1], ['a', -1], ['a', -1], ['a', -1]];
+
+        // occurrences of letters in guess in targetWord
+        // make new map with all letters in alphabet as keys and 0 as values
+        let occurrences = new Map();
+        for (let i = 0; i < NLETTER; i++) {
+            occurrences.set(String.fromCharCode(97 + i), 0);
+        }
+
+        // for each guess letter, check if it is in targetWord
+        // if it is, count up occurrences of that letter in targetWord
+        for (let i = 0; i < NPOS; i++) {
+            if ($targetWordStore.cleartext.includes($guessStore[i])) {
+                // set value to min of current value and number of occurrences of letter in targetWord
+                occurrences.set($guessStore[i], Math.min(occurrences.get($guessStore[i]) + 1,
+                    $targetWordStore.cleartext.split($guessStore[i]).length - 1));
+
+            }
+        }
 
         for (let i = 0; i < NPOS; i++) {
             if ($guessStore[i] === $targetWordStore['cleartext'][i]) {
                 res[i] = [$guessStore[i], 0];
-            } else if (correctLetters.has($guessStore[i])) {
+            } else if ($targetWordStore.cleartext.includes($guessStore[i]) && occurrences.get($guessStore[i]) > 0) {
                 res[i] = [$guessStore[i], 1];
+                // decrement occurrence of letter in guess when used
+                occurrences.set($guessStore[i], occurrences.get($guessStore[i]) - 1);
             } else {
                 res[i] = [$guessStore[i], 2];
             }

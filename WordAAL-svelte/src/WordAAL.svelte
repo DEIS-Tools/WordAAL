@@ -27,8 +27,18 @@
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
+    import InfoCard from "./components/InfoCard.svelte";
+    import {onMount} from "svelte";
 
-
+    let hideWelcomeInfo = false;
+    onMount(() => {
+        console.log("cookie", document.cookie)
+        if (
+            document.cookie.split(";").some((item) =>
+                item.trim().includes("wordaalWelcomeCardShow=0"))) {
+            hideWelcomeInfo = true;
+        }
+    });
 
     const onWordleKeyDown = (event) => {
         // backspace: remove the last character
@@ -103,6 +113,11 @@
             <SettingsChooser/>
         </Card>
     </CollapsiblePanel>
+
+    <InfoCard show={!hideWelcomeInfo} text="Welcome to WordAAL alpha;  the Wordle game enhanced with UPPAAL Stratego assistance.<br/>
+    Explore how different strategies prioritise guesses on any target word in the Wordle word-list.<br/>
+    This is a work in progress, and we would like to hear your feedback on how to improve it.<br/>
+"/>
 </main>
 
 <style>

@@ -16,10 +16,17 @@
     </FormField>
 
 </div>
-    <WordPicker/>
+<WordPicker/>
 <div class="option-row">
     <Button variant="raised" on:click={() => (location.reload())}>
         New game
+    </Button> &nbsp;
+    <Button variant="raised"
+            on:click={() => {
+                document.cookie = "wordaalWelcomeCardShow=0; SameSite=None; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure";
+                location.reload()
+            }}>
+        Show welcome information
     </Button>
 </div>
 

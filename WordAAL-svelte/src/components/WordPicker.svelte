@@ -33,7 +33,7 @@
         let chars = WORDS[index];
 
         //fixme: DEBUG hardcoding target for testing
-        /*target = "bidet"; //hardcode target word
+       /* target = "sunny"; //hardcode target word
         chars = convertStringToCharArray(target)
         index = WORDS_STRINGIFIED.indexOf(target);
         console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");*/
