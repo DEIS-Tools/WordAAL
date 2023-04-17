@@ -61,7 +61,7 @@
         setTimeout(() => {
             guessStore.set(guess);
             guessSubmitTrigger.set(true);
-        }, 750);
+        }, Math.floor(Math.random() * (750 - 150 + 1) + 150)); // random delay between 150 and 750ms before submitting guess
     }
 </script>
 
