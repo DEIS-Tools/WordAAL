@@ -23,7 +23,7 @@
     </Button> &nbsp;
     <Button variant="raised"
             on:click={() => {
-                document.cookie = "wordaalWelcomeCardShow=0; SameSite=None; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure";
+                document.cookie = "wordaalWelcomeCardShow=0; SameSite=Lax; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
                 location.reload()
             }}>
         Show welcome information

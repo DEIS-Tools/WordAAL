@@ -9,7 +9,7 @@
 
     let close = () => {
         show = false;
-        document.cookie = "wordaalWelcomeCardShow=0; SameSite=None; expires=Thu, 01 Jan 9999 00:00:00 UTC; path=/; Secure";
+        document.cookie = "wordaalWelcomeCardShow=0; SameSite=Lax; expires=Thu, 01 Jan 9999 00:00:00 UTC; path=/";
     }
 
 </script>
@@ -34,11 +34,11 @@
 
 <style>
     .infocard {
+        scale: 90%;
         position: fixed;
         bottom: 0;
         right: 0;
         width: auto;
         height: auto;
-        padding: 5px;
     }
 </style>

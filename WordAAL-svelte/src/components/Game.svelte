@@ -35,18 +35,6 @@
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
 
-/*        export function resetGame() {
-            setTimeout(() => {
-                conso;le.warn("resetting game");
-                guessStore.set("");
-                responseStore.set([]);
-                responseHistoryStore.set([]);
-                newGameTrigger.set(true);
-                winTrigger.set(false);
-                gameInProgress.set(false)
-            }, 1000);
-        }*/
-
     export function wordleResponse() {
         if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {
             console.error("wordleResponse: targetWord or guess is undefined or guess is not NPOS long")
@@ -192,9 +180,9 @@
 
     winTrigger.subscribe((win) => {
         if (win) {
-            fireworks.launch(10);
+            fireworks.launch(7);
             let interval = setInterval(() => {
-                fireworks.launch(5);
+                fireworks.launch(3);
             }, 500);
             setTimeout(() => {
                 clearInterval(interval)
