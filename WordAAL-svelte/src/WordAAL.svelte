@@ -27,6 +27,7 @@
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
+    import Paper, { Title, Subtitle, Content } from '@smui/paper';
     import InfoCard from "./components/InfoCard.svelte";
     import {onMount} from "svelte";
 
@@ -98,9 +99,11 @@
 
     <div class="wrapper">
         <div class="left">
+            <div class="mdc-typography--headline5 header">Wordle game</div>
             <Game target="{$targetWordStore}"/>
         </div>
         <div class="right">
+            <div class="mdc-typography--headline5 header">UPPAAL Stratego guesses</div>
             <ProposalChooser/>
         </div>
         <StrategyDriver/>
@@ -130,28 +133,42 @@
 
     .wrapper {
         display: flex;
-        border: 1px solid grey;
         border-radius: 10px;
         padding: 32px 16px;
         overflow: hidden; /* will contain if #first is longer than #second */
         min-width: 850px;
         min-height: 320px;
+        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.5);
+        margin-bottom: 10px;
     }
 
     .left {
         display: flex;
         flex-grow: 2;
+        flex-direction: column;
         padding: 10px;
-
+        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        margin-right: 10px;
+        min-height: 342px;
     }
 
     .right {
         display: flex;
-        justify-content: center;
         flex-grow: 1;
+        flex-direction: column;
         padding: 10px;
         overflow: hidden; /* if you don't want #second to wrap below #first */
         min-width: 450px;
+        margin-left: 10px;
+        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        min-height: 342px;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 10px;
     }
 
     #firework {
