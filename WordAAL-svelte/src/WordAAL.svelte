@@ -84,6 +84,13 @@
 
     let gameOptionsOpen = false;
 
+    let keys = document.querySelectorAll('.key');
+
+    keys.forEach(key => {
+        console.error(key);
+    });
+
+
 </script>
 
 <main>
@@ -103,13 +110,13 @@
             <Game target="{$targetWordStore}"/>
         </div>
         <div class="right">
-            <div class="mdc-typography--headline5 header">UPPAAL Stratego guesses</div>
+            <div class="mdc-typography--headline5 header">UPPAAL Stratego suggestions</div>
             <ProposalChooser/>
         </div>
         <StrategyDriver/>
     </div>
 
-    <Keyboard layout="wordle" on:keydown={onWordleKeyDown}/>
+    <Keyboard layout="wordle" --background="#a4aec4" --active-background="#6F7685" --text-transform="capitalize" on:keydown={onWordleKeyDown}/>
 
     <CollapsiblePanel title={'Game options'} color={'black'} bind:isPanelOpen={gameOptionsOpen}>
         <Card padded>
@@ -134,12 +141,13 @@
     .wrapper {
         display: flex;
         border-radius: 10px;
-        padding: 32px 16px;
+        padding: 15px;
         overflow: hidden; /* will contain if #first is longer than #second */
         min-width: 850px;
         min-height: 320px;
         box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.5);
         margin-bottom: 10px;
+
     }
 
     .left {
@@ -147,10 +155,11 @@
         flex-grow: 2;
         flex-direction: column;
         padding: 10px;
-        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
+        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.3);
         border-radius: 10px;
-        margin-right: 10px;
-        min-height: 342px;
+        margin: 15px;
+        min-height: 402px;
+        background-color: rgb(121, 184, 81, 0.2);
     }
 
     .right {
@@ -158,17 +167,22 @@
         flex-grow: 1;
         flex-direction: column;
         padding: 10px;
-        overflow: hidden; /* if you don't want #second to wrap below #first */
+        overflow: hidden;
         min-width: 450px;
-        margin-left: 10px;
+        margin: 15px;
         box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
         border-radius: 10px;
-        min-height: 342px;
+        min-height: 402px;
+        background-color: rgb(243, 194, 55, 0.2);
     }
 
     .header {
         text-align: center;
         margin-bottom: 10px;
+    }
+
+    :global(.key--x){
+        color: #ff0000;
     }
 
     #firework {

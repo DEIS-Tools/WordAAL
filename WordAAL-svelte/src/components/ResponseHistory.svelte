@@ -113,7 +113,6 @@
         justify-content: left;
         align-items: center;
         border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.81);
     }
 
     .historyEntry:hover {

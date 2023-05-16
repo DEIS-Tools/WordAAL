@@ -164,7 +164,6 @@
         justify-content: left;
         align-items: center;
         border-radius: 5px;
-        background-color: rgba(255, 255, 255, 0.81);
     }
 
     .proposal:hover {
@@ -201,5 +200,9 @@
         transition: all 0.5s ease;
         opacity: 0.5;
         pointer-events: none;
+    }
+
+    .noMoreProposalsCard {
+        padding: 10px;
     }
 </style>
