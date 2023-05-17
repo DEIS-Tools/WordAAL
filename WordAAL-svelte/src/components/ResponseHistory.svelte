@@ -31,7 +31,7 @@
             }
         }
         // reset and recalc prelim knowledge
-        knowledge = new Array(NPOS).fill(2);
+        knowledge = new Array(NPOS).fill(3);
         colourPrelimGuess()
     }
 
@@ -44,7 +44,6 @@
         const correctLetters = $sureLettersStore.reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
         }, {});
-
 
         // convert prelim guess to 0-indexed character
         let guess = prelimGuess.trim().toLowerCase();

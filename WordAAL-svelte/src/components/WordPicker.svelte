@@ -32,18 +32,15 @@
         target = target.join('');
         let chars = WORDS[index];
 
+        /*
         //fixme: DEBUG hardcoding target for testing
-       /* target = "sunny"; //hardcode target word
+        target = "mussy"; //hardcode target word
         chars = convertStringToCharArray(target)
         index = WORDS_STRINGIFIED.indexOf(target);
-        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");*/
+        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
+        */
 
         targetWordStore.set({cleartext: target, index: index, chars: chars});
-    }
-
-    $:{
-        // when targetWordStore changes, log it
-        console.log("target word changed to", $targetWordStore.cleartext);
     }
 
 

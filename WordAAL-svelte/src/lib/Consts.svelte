@@ -1,4 +1,4 @@
-<script context="module">
+<script context="module" lang="ts">
     export const NWORDS = 12972;
     export const ASCII_OFFSET = 97;
     export const NLETTER = 26;
@@ -48,6 +48,13 @@
             }
         }
         return false;
+    }
+
+    export enum WordleColours {
+        UNKNOWN = '#dce1ed',
+        CORRECT = '#79b851',
+        INCORRECT = '#a4aec4',
+        WRONG_POSITION = '#f3c237',
     }
 
     export const WORDS = [

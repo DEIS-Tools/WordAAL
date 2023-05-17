@@ -42,7 +42,6 @@
         }
 
         const correctLetters = $targetWordStore['cleartext'];
-        console.log("correctLetters", correctLetters);
         let res = [['a', -1], ['a', -1], ['a', -1], ['a', -1], ['a', -1]];
 
         // occurrences of letters in guess in targetWord
@@ -56,7 +55,7 @@
         // if it is, count up occurrences of that letter in targetWord
         for (let i = 0; i < NPOS; i++) {
             if ($targetWordStore.cleartext.includes($guessStore[i])) {
-                // set value to min of current value and number of occurrences of letter in targetWord
+                // set value to min of current value + number of occurrences of letter in targetWord
                 occurrences.set($guessStore[i], Math.min(occurrences.get($guessStore[i]) + 1,
                     $targetWordStore.cleartext.split($guessStore[i]).length - 1));
 
@@ -163,8 +162,6 @@
     $: if ($guessSubmitTrigger) {
         guessSubmitTrigger.update((x) => {
             checkGuess();
-            setTimeout(() => {
-            }, 100);
             return !x;
         });
     }

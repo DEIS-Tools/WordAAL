@@ -21,15 +21,15 @@
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
     import StrategyDriver from "./components/StrategyDriver.svelte";
-    import {guessStore, guessSubmitTrigger, targetWordStore} from "./stores/stores"
+    import {guessStore, guessSubmitTrigger, knowledgeStore, targetWordStore, globalCountsStore} from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
-    import Paper, { Title, Subtitle, Content } from '@smui/paper';
     import InfoCard from "./components/InfoCard.svelte";
     import {onMount} from "svelte";
+    import {WordleColours} from './lib/Consts.svelte'
 
     let hideWelcomeInfo = false;
     onMount(() => {
@@ -76,20 +76,50 @@
         {value: "W", state: 0},
         {value: "o", state: 1},
         {value: "r", state: 2},
-        {value: "d", state: 1},
+        {value: "d", state: 3},
         {value: "A", state: 0},
-        {value: "A", state: 0},
+        {value: "A", state: 1},
         {value: "L", state: 2},
     ]
 
     let gameOptionsOpen = false;
 
-    let keys = document.querySelectorAll('.key');
 
-    keys.forEach(key => {
-        console.error(key);
-    });
+    $: updateKeyboardShading($knowledgeStore, $globalCountsStore);
 
+
+    function updateKeyboardShading(knowledge, counts) {
+
+        if (knowledge.length < 1 || knowledge[0] === undefined) {
+            return;
+        }
+        // jank method of getting keyboard key elements (fix if exchanging keyboard to other component)
+        let keys = Array.from(document.querySelectorAll('[class^="key key--"]'));
+
+        const combKnowledge = knowledge.reduce((acc, curr) => {
+            return acc.map((value, index) => Math.max(value, curr[index]));
+        });
+        keys.forEach(key => {
+            let letter = key.innerHTML.toLowerCase();
+            if (letter.length === 1) {
+                let key_color = WordleColours.UNKNOWN;
+
+                let char = letter.charCodeAt(0) - 97;
+                if (counts[char] > 0) {
+                    key_color = WordleColours.WRONG_POSITION;
+                }
+                if (combKnowledge[char] === 1) {
+                    key_color = WordleColours.CORRECT;
+                } else if (combKnowledge[char] === -1) {
+                    key_color = WordleColours.INCORRECT;
+                }
+                console.log(WordleColours.UNKNOWN)
+                // set shading
+                key.style.backgroundColor = key_color;
+            }
+        });
+
+    }
 
 </script>
 
@@ -116,7 +146,8 @@
         <StrategyDriver/>
     </div>
 
-    <Keyboard layout="wordle" --background="#a4aec4" --active-background="#6F7685" --text-transform="capitalize" on:keydown={onWordleKeyDown}/>
+    <Keyboard layout="wordle" --background="#dce1ed" --active-background="#6F7685" --text-transform="capitalize"
+              --active-transform="bold" on:keydown={onWordleKeyDown}/>
 
     <CollapsiblePanel title={'Game options'} color={'black'} bind:isPanelOpen={gameOptionsOpen}>
         <Card padded>
@@ -131,67 +162,63 @@
 "/>
 </main>
 
-<style>
-    .logo {
-        transform: scale(1.25);
-        margin: 0 auto;
-        text-align: center;
-    }
+<style lang="scss">
+  .logo {
+    transform: scale(1.25);
+    margin: 0 auto;
+    text-align: center;
+  }
 
-    .wrapper {
-        display: flex;
-        border-radius: 10px;
-        padding: 15px;
-        overflow: hidden; /* will contain if #first is longer than #second */
-        min-width: 850px;
-        min-height: 320px;
-        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.5);
-        margin-bottom: 10px;
+  .wrapper {
+    display: flex;
+    border-radius: 10px;
+    padding: 15px;
+    overflow: hidden; /* will contain if #first is longer than #second */
+    min-width: 850px;
+    min-height: 320px;
+    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.5);
+    margin-bottom: 10px;
 
-    }
+  }
 
-    .left {
-        display: flex;
-        flex-grow: 2;
-        flex-direction: column;
-        padding: 10px;
-        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.3);
-        border-radius: 10px;
-        margin: 15px;
-        min-height: 402px;
-        background-color: rgb(121, 184, 81, 0.2);
-    }
+  .left {
+    display: flex;
+    flex-grow: 2;
+    flex-direction: column;
+    padding: 10px;
+    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin: 15px;
+    min-height: 402px;
+    background-color: rgb(121, 184, 81, 0.2);
+  }
 
-    .right {
-        display: flex;
-        flex-grow: 1;
-        flex-direction: column;
-        padding: 10px;
-        overflow: hidden;
-        min-width: 450px;
-        margin: 15px;
-        box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
-        border-radius: 10px;
-        min-height: 402px;
-        background-color: rgb(243, 194, 55, 0.2);
-    }
+  .right {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 10px;
+    overflow: hidden;
+    min-width: 450px;
+    margin: 15px;
+    box-shadow: 1px 2px 3px 1px rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    min-height: 402px;
+    background-color: rgb(243, 194, 55, 0.2);
+  }
 
-    .header {
-        text-align: center;
-        margin-bottom: 10px;
-    }
+  .header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
 
-    :global(.key--x){
-        color: #ff0000;
-    }
-
-    #firework {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 100;
-        pointer-events: none;
-    }
+  #firework {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    pointer-events: none;
+  }
 </style>

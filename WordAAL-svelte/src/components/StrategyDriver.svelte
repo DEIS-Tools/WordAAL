@@ -434,6 +434,11 @@
         const correctLetters = sureLetters.reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
         }, {});
+        const combKnowledge = knowledge.reduce((acc, curr) => {
+            return acc.map((value, index) => Math.max(value, curr[index]));
+        });
+
+        let duplicateHints = new Array(NLETTER).fill(0);
 
         // get wordWids for all words in responseHistory
         let responseHistoryWids = [];
@@ -444,7 +449,10 @@
         }
 
         for (let wid = 0; wid < NWORDS; ++wid) {
-            let word = {wid: wid, word: "", knowledge: [2, 2, 2, 2, 2], cost: Infinity};
+            let word = {wid: wid, word: "", knowledge: [3, 3, 3, 3, 3], cost: Infinity};
+
+            // reset duplicate hints
+            duplicateHints.fill(0);
 
             // if word is in any responseHistory, then skip
             if (responseHistoryWids.includes(wid)) {
@@ -455,10 +463,14 @@
 
                 for (let n = 0; n < NPOS; n++) {
                     let char = WORDS[wid][n];
+                    // if definitely not in target word, set knowledge to 2
+                    if (combKnowledge[char] === -1) {
+                        word["knowledge"][n] = 2;
+                    }
 
-                    // if counts for current letter is positive and is not known sure letter, then set knowledge to 1
-
-                    if (globalCounts[char] > (correctLetters[char] || 0)) {
+                    // if counts for current letter is positive and is not a sure letter, then set knowledge to 1
+                    if ((globalCounts[char] > (correctLetters[char] || 0)) && duplicateHints[char] === 0) {
+                        duplicateHints[char]++;
                         // FIXME only do this for the number of times the letter appears in the target word
                         word["knowledge"][n] = 1;
                     }
