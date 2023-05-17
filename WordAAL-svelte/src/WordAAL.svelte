@@ -113,7 +113,6 @@
                 } else if (combKnowledge[char] === -1) {
                     key_color = WordleColours.INCORRECT;
                 }
-                console.log(WordleColours.UNKNOWN)
                 // set shading
                 key.style.backgroundColor = key_color;
             }

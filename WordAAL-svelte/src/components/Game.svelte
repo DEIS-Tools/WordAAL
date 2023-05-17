@@ -41,7 +41,6 @@
             return;
         }
 
-        const correctLetters = $targetWordStore['cleartext'];
         let res = [['a', -1], ['a', -1], ['a', -1], ['a', -1], ['a', -1]];
 
         // occurrences of letters in guess in targetWord
@@ -61,10 +60,10 @@
 
             }
         }
-
         for (let i = 0; i < NPOS; i++) {
             if ($guessStore[i] === $targetWordStore['cleartext'][i]) {
                 res[i] = [$guessStore[i], 0];
+                occurrences.set($guessStore[i], occurrences.get($guessStore[i]) - 1);
             } else if ($targetWordStore.cleartext.includes($guessStore[i]) && occurrences.get($guessStore[i]) > 0) {
                 res[i] = [$guessStore[i], 1];
                 // decrement occurrence of letter in guess when used
