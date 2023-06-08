@@ -20,6 +20,7 @@
     import Dialog, {Title, Content, Actions, InitialFocus} from '@smui/dialog';
     import Button from '@smui/button';
     import {Fireworks} from 'fireworks-js'
+    import WordleAnswerToday from "./WordleAnswerToday.svelte";
 
 
     let fireworks;

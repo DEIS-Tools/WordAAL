@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
     import {strategyStore} from "../stores/stores.js";
     import SegmentedButton, {Segment} from '@smui/segmented-button';
     import {Label} from '@smui/common';
     import Switch from '@smui/switch';
     import FormField from '@smui/form-field';
-    import Tooltip, { Wrapper } from '@smui/tooltip';
+    import Tooltip, {Wrapper} from '@smui/tooltip';
+    import {onMount} from "svelte";
 
 
     let availableStrats = [
@@ -28,44 +29,62 @@
     ]
 
     let strategy = availableStrats[1];
-
     let hard = true;
-    $: {
+
+    onMount(() => {
+        let strategy = localStorage.getItem("strategy");
+        setTimeout(() => {
+            // load strategy from local storage
+            if (strategy !== null) {
+                // set buttons to match
+                let s = JSON.parse(strategy);
+                let strat = availableStrats.find(strat => strat.name === s.s.name);
+                console.warn(strat)
+                if (strat !== undefined) {
+                    strategy = s.s;
+                    hard = s.hard;
+                    updateStrategy();
+                } else {
+                    console.error("strategy index not found")
+                }
+            }
+        }, 500);
+    });
+
+    function updateStrategy() {
         if (strategy.name === "permissive" && !hard) {
             alert("Permissive mode is only compatible with hard mode - turning it on now.")
             hard = true;
         }
-
-        // set strategy config store
+        // set strategy config store and local storage
         let s = availableStrats.find(s => s.name === strategy.name);
         if (s !== undefined) {
             strategyStore.set({s, hard: hard});
+            localStorage.setItem("strategy", JSON.stringify({s, hard: hard}));
         } else {
             console.error("strategy index not found")
         }
     }
 
-
-
-
 </script>
-    <div class="strategies">
-        <p>Strategy:&nbsp;</p>
-        <SegmentedButton segments={availableStrats} let:segment singleSelect bind:selected={strategy}>
-            <Wrapper>
+<div class="strategies">
+    <p>Strategy:&nbsp;</p>
+    <SegmentedButton on:click={updateStrategy} segments={availableStrats} let:segment singleSelect
+                     bind:selected={strategy}>
+        <Wrapper>
             <Segment {segment} touch title={segment.name}>
                 <Label>{segment.name}</Label>
             </Segment>
-                <Tooltip>
-                    {segment.desc}
-                </Tooltip>
-            </Wrapper>
-        </SegmentedButton>
-        <p>&nbsp;Hard-mode:</p>
-        <FormField>
-            <Switch bind:checked={hard} touch/>
-        </FormField>
-    </div>
+            <Tooltip>
+                {segment.desc}
+            </Tooltip>
+        </Wrapper>
+    </SegmentedButton>
+    <p>&nbsp;Hard-mode:</p>
+    <FormField>
+        <Switch on:click={updateStrategy} bind:checked={hard} touch/>
+    </FormField>
+</div>
 
 
 <style>

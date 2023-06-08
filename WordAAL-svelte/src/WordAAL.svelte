@@ -28,18 +28,10 @@
     import SettingsChooser from "./components/SettingsChooser.svelte";
     import Card from '@smui/card';
     import InfoCard from "./components/InfoCard.svelte";
-    import {onMount} from "svelte";
     import {WordleColours} from './lib/Consts.svelte'
 
     let hideWelcomeInfo = false;
-    onMount(() => {
-        console.log("cookie", document.cookie)
-        if (
-            document.cookie.split(";").some((item) =>
-                item.trim().includes("wordaalWelcomeCardShow=0"))) {
-            hideWelcomeInfo = true;
-        }
-    });
+
 
     const onWordleKeyDown = (event) => {
         // backspace: remove the last character
