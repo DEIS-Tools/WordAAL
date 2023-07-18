@@ -98,7 +98,12 @@
             staticPath += store.s.location;
         }
 
-        loadStrategoStrategyJSON(staticPath);
+        loadStrategoStrategyJSON(staticPath).then((json) => {
+            strategyJSON = json;
+            showWords();
+        }).catch((error) => {
+            console.error("Error loading strategy: " + error);
+        });
         // reset path for reload of another strategy
         staticPath = "strategies/";
 
@@ -118,21 +123,31 @@
         }
     }
 
-    function loadStrategoStrategyJSON(path) {
-        let xobj = new XMLHttpRequest();
-        xobj.overrideMimeType("application/json");
-        xobj.open('GET', path, true);
-        xobj.onreadystatechange = function () {
-            if (xobj.readyState === 4 && xobj.status === 200) {
-                // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
-                strategyJSON = JSON.parse(xobj.responseText);
-                //let modeText: string = $strategyStore['hard'] ? "hard" : "easy";
-                //snackbarDriverInfoText = `driver: finished loading strategy ${$strategyStore.s.name} on ${modeText} mode`;
-                //snackbarDriverInfo.open();
-                showWords();
+    async function loadStrategoStrategyJSON(path) {
+        if (!('caches' in window)) {
+            // Caches API not available, fetch directly
+            let response = await fetch(path);
+
+            return await response.json();
+        }
+
+        const cache = await caches.open("wordaalStrategiesCache");
+
+        // Try to get the response from the cache
+        let cachedResponse = await cache.match(path);
+
+        if (cachedResponse && cachedResponse.ok) {
+            // cachedResponse is a Response object, we need to parse it to json
+            return await cachedResponse.json();
+        } else {
+            // If not found in cache, fetch from network and cache it
+            let response = await fetch(path);
+            if (response.ok) {
+                let clonedResponse = response.clone();
+                cache.put(path, clonedResponse);
             }
-        };
-        xobj.send(null);
+            return await response.json();
+        }
     }
 
     function updateCount(guess, response) {
