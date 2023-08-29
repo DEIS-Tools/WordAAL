@@ -23,3 +23,10 @@ npm run dev
 npm run build
 ```
 Then copy the contents of `WordAAL-svelte/dist/` to your web-server.
+
+### Fix
+For [uppaal.org](uppaal.org) webserver, you might need to remove leading slash from `dist/index.html` sources due to configured Apache rewrite rules.
+```html
+<script type="module" crossorigin src="/assets/index-0c1789d2.js"></script>
+<link rel="stylesheet" href="/assets/index-a39a2349.css">
+```
