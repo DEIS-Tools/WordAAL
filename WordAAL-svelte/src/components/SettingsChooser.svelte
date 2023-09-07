@@ -4,7 +4,7 @@
     import FormField from "@smui/form-field";
     import Switch from "@smui/switch";
 
-    import {hideProposalsStore} from "../stores/stores.js";
+    import {hideProposalsStore, debugModeStore} from "../stores/stores.js";
     import Button from "@smui/button";
 </script>
 
@@ -28,6 +28,10 @@
             }}>
         Show welcome information
     </Button>
+    <FormField>
+        <p>Debug mode:</p>
+        <Switch bind:checked={$debugModeStore} touch/>
+    </FormField>
 </div>
 
 <style>

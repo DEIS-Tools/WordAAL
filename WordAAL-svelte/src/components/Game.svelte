@@ -3,7 +3,8 @@
         NPOS,
         MAX_N_GUESSES,
         wordInWordlist,
-        NLETTER
+        NLETTER,
+        VANILLA_RESPONSE_METHOD,
     } from "../lib/Consts.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
     import {
@@ -35,6 +36,31 @@
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
 
+
+
+    /*
+    void make_response() {
+    int[0,NPOS] counts[letter_t];
+    // mark correct positions and count unmarked letters:
+    for (p : pos_t)
+        if (guess[p] == solution[p])
+            response[p] = GREEN;
+        else {
+            response[p] = GRAY;
+            counts[solution[p]]++;
+        }
+    // mark out of place letters:
+    for (p : pos_t) {
+        if (response[p] != GREEN) {
+            if (counts[guess[p]] > 0) {
+                response[p] = YELLOW;
+                counts[guess[p]]--;
+            }
+        }
+    }
+}
+
+     */
     export function wordleResponse() {
         if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {
             console.error("wordleResponse: targetWord or guess is undefined or guess is not NPOS long")
@@ -213,11 +239,10 @@
     <Title id="gameEndDialogTitle">End of game</Title>
     <Content id="gameEndDialogContent">
         {#if $winTrigger}
-            You have won! 🎉
+            <h4>You won! 🎉</h4>
         {:else if $lossTrigger}
-            You have lost! ☹️
+            <h4>You lost! ☹️</h4>
         {/if}
-        <br/><br/>
         Start a new game or continue looking at current game?
     </Content>
     <Actions>

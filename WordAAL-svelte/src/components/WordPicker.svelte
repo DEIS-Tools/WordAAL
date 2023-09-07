@@ -31,13 +31,11 @@
         }
         target = target.join('');
         let chars = WORDS[index];
-        /*
-                //fixme: DEBUG hardcoding target for testing
-                target = "enjoy"; //hardcode target word
-                chars = convertStringToCharArray(target)
-                index = WORDS_STRINGIFIED.indexOf(target);
-                console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
-        */
+        //fixme: DEBUG hardcoding target for testing
+        target = "grain"; //hardcode target word
+        chars = convertStringToCharArray(target)
+        index = WORDS_STRINGIFIED.indexOf(target);
+        console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
         targetWordStore.set({cleartext: target, index: index, chars: chars});
     }
 

@@ -32,6 +32,7 @@
     "@smui/snackbar": "^7.0.0-beta.0",
     "@watergis/svelte-collapsible-panel": "^0.0.15",
     "svelte-keyboard": "^0.5.5",
-    "svelte-material-ui": "^7.0.0-beta.3"
+    "svelte-material-ui": "^7.0.0-beta.3",
+    "ts-pattern": "^5.0.5"
   }
 }
