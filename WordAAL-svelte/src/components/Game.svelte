@@ -37,30 +37,6 @@
     let errorText: string = "DEFAULT ERROR TEXT";
 
 
-
-    /*
-    void make_response() {
-    int[0,NPOS] counts[letter_t];
-    // mark correct positions and count unmarked letters:
-    for (p : pos_t)
-        if (guess[p] == solution[p])
-            response[p] = GREEN;
-        else {
-            response[p] = GRAY;
-            counts[solution[p]]++;
-        }
-    // mark out of place letters:
-    for (p : pos_t) {
-        if (response[p] != GREEN) {
-            if (counts[guess[p]] > 0) {
-                response[p] = YELLOW;
-                counts[guess[p]]--;
-            }
-        }
-    }
-}
-
-     */
     export function wordleResponse() {
         if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {
             console.error("wordleResponse: targetWord or guess is undefined or guess is not NPOS long")
@@ -86,22 +62,27 @@
 
             }
         }
+        // first pass for correct letters in correct position
         for (let i = 0; i < NPOS; i++) {
             if ($guessStore[i] === $targetWordStore['cleartext'][i]) {
                 res[i] = [$guessStore[i], 0];
                 occurrences.set($guessStore[i], occurrences.get($guessStore[i]) - 1);
-            } else if ($targetWordStore.cleartext.includes($guessStore[i]) && occurrences.get($guessStore[i]) > 0) {
+            }
+        }
+        // incorrectly placed letters and letters not in targetWord
+        for (let i = 0; i < NPOS; i++) {
+            if ($targetWordStore.cleartext.includes($guessStore[i]) && occurrences.get($guessStore[i]) > 0) {
                 res[i] = [$guessStore[i], 1];
                 // decrement occurrence of letter in guess when used
                 occurrences.set($guessStore[i], occurrences.get($guessStore[i]) - 1);
-            } else {
+            } else if (res[i][1] === -1) {
                 res[i] = [$guessStore[i], 2];
             }
         }
 
         // check legality of res
-        if (res.length !== NPOS) {
-            console.error("wordleResponse: res is not NPOS long");
+        if (res.some((x) => x[1] === -1)) {
+            console.error("wordleResponse: response was not computed for all letters", res);
             return;
         }
 

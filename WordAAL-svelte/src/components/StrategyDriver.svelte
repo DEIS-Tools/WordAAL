@@ -225,9 +225,11 @@
                 } else {
                     // appears, but not in this position
                     knowledge[pos][currGuessLetter] = Response.SURELY_NOT;
+                    // check if for every other pos with same letter, that letter is not maybe
                     let all_ok = true;
                     for (let q = 0; q < NPOS; ++q) {
-                        all_ok &= (guess[q] != currGuessLetter || response[q] !== 1);
+                        // TYPE COERCION below, response is a string, NaN
+                        all_ok &= (guess[q] != currGuessLetter || response[q] != 1);
                         if (!all_ok) break;
                     }
                     if (all_ok) {
