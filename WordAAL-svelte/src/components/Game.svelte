@@ -4,7 +4,6 @@
         MAX_N_GUESSES,
         wordInWordlist,
         NLETTER,
-        VANILLA_RESPONSE_METHOD,
     } from "../lib/Consts.svelte";
     import ResponseHistory from "./ResponseHistory.svelte";
     import {
@@ -35,7 +34,6 @@
     let successText: string = "DEFAULT SUCCESS TEXT";
     let warningText: string = "DEFAULT WARNING TEXT";
     let errorText: string = "DEFAULT ERROR TEXT";
-
 
     export function wordleResponse() {
         if ($targetWordStore['cleartext'] === undefined || $guessStore === undefined || $guessStore.length !== NPOS) {

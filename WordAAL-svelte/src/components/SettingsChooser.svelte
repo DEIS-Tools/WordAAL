@@ -28,10 +28,10 @@
             }}>
         Show welcome information
     </Button>
-    <FormField>
+<!--    <FormField>
         <p>Debug mode:</p>
         <Switch bind:checked={$debugModeStore} touch/>
-    </FormField>
+    </FormField>-->
 </div>
 
 <style>

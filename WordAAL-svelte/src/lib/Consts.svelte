@@ -6,8 +6,6 @@
     export const MAX_N_GUESSES = 6;
     export const NUM_PROPOSALS = 5;
     export const INDEX_LAST_CURATED_WORD = 2314;
-    //
-    export const VANILLA_RESPONSE_METHOD = true;
 
     export function convertStringToCharArray(str) {
         const res = new Array(str.length);

@@ -54,7 +54,6 @@
             proposals = p.map(elem =>
                 (elem.cost === Infinity || elem.cost === undefined) ? {...elem, cost: 1000} : elem)
                 .slice(0, NUM_PROPOSALS);
-            console.log(proposals);
             loading = false;
             firstLoad = false;
         }

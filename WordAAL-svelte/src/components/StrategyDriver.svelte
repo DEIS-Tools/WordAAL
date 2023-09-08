@@ -20,6 +20,7 @@
         winTrigger,
         lossTrigger,
         knowledgeHtmlStore,
+        debugModeStore,
     } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
@@ -203,7 +204,6 @@
     }
 
     function updateConservative(response, guess) {
-        console.log("update conservative", response, guess);
         for (let pos = 0; pos < NPOS; ++pos) {
             let currGuessLetter = guess[pos];
             if (response[pos] == 0) { // letter p in guess is correctly placed
@@ -309,8 +309,9 @@
             for (let p = 0; p < NPOS; ++p) {
                 if (knowledge[p][WORDS[wid][p]] === -1) {
                     let error = "Uses invalid character '" + String.fromCharCode(97 + WORDS[wid][p]) + "' at position " + p + " (combined or conservative)";
-                    if (wid === 1303)
+                    if ($debugModeStore) {
                         console.error(error);
+                    }
                     return error;
                 }
             }
@@ -327,8 +328,9 @@
             }
             if (!(new_knowledge || correct)) {
                 let error = "The word contains no new information (combined or permissive)";
-                if (wid === 1303)
+                if ($debugModeStore) {
                     console.error(error);
+                }
                 return error;
             }
         }
@@ -392,7 +394,6 @@
         updateCount(num_guess, response);
         updateHints(num_guess, response);
 
-        console.log("updateAal: mode", mode, "strategy", strategy, "response", response, "num_guess", num_guess);
         if (mode) updateHard();
         if (strategy === 0) {
             updateConservative(response, num_guess);
@@ -488,10 +489,6 @@
                 continue;
             }
 
-            if (wid == 1303) {
-                console.log("1303 is consistent: ", consistent(wid))
-            }
-
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
                 // for NPOS; for NLETTER, if knowledge[p][l] is 1, then correct and put knowledge 0 to word
 
@@ -519,8 +516,7 @@
 
                 proposals.push(word);
             } else {
-                // word is not consistent
-                // convert word to string
+                // word is not consistent, convert word to string
                 let wordString = "";
                 for (let i = 0; i < NPOS; i++) {
                     wordString += String.fromCharCode(97 + WORDS[wid][i]);
@@ -533,7 +529,6 @@
         });
 
         console.log("number of proposals: " + proposals.length + " best action: " + best)
-        console.log(proposals)
 
         proposalsStore.set(proposals);
     }
