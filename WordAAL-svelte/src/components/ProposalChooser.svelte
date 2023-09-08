@@ -20,6 +20,7 @@
     let proposals = [];
     const dontKnow = [[' ', ' ', ' ', ' ', ' ']];
     let firstLoad = true;
+    let infinity_cost = 9999;
 
 
     $: {
@@ -31,7 +32,8 @@
 
     function costShade(cost) {
         let min = Math.min(...proposals.map(proposal => proposal.cost));
-        let max = Math.max(...proposals.map(proposal => proposal.cost));
+        // max, ignoring infinity_cost
+        let max = Math.max(...proposals.filter(proposal => proposal.cost !== infinity_cost).map(proposal => proposal.cost));
 
         // normalise cost to be between 0 and 1 based on min and max
         cost = (cost - min) / (max - min);
@@ -52,7 +54,8 @@
         let p = $proposalsStore;
         if (Array.isArray(p)) {
             proposals = p.map(elem =>
-                (elem.cost === Infinity || elem.cost === undefined) ? {...elem, cost: 1000} : elem)
+                (elem.cost === Infinity || elem.cost === undefined) ? {...elem, cost: infinity_cost} : elem)
+                .sort((a, b) => a.cost - b.cost)
                 .slice(0, NUM_PROPOSALS);
             loading = false;
             firstLoad = false;
@@ -86,7 +89,11 @@
                             <Set chips={['1']} let:chip nonInteractive>
                                 <Chip {chip}>
                                     <Text><p class="cost" style:color={costShade(proposal.cost)}>
-                                        &nbsp;{proposal.cost.toFixed(3)}
+                                        {#if proposal.cost === infinity_cost}
+                                            ??.???
+                                        {:else}
+                                            &nbsp;{proposal.cost.toFixed(3)}
+                                        {/if}
                                         &nbsp;</p>
                                     </Text>
                                     <TrailingIcon class="material-icons">payments</TrailingIcon>
