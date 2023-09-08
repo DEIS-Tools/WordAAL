@@ -19,6 +19,8 @@
         gameInProgress,
         winTrigger,
         lossTrigger,
+        knowledgeHtmlStore,
+        debugModeStore,
     } from "../stores/stores.js";
     import Snackbar, {Label} from '@smui/snackbar';
 
@@ -221,10 +223,13 @@
                         // mark this letter absent in all positions in knowledge
                         knowledge[q][currGuessLetter] = Response.SURELY_NOT;
                 } else {
+                    // appears, but not in this position
                     knowledge[pos][currGuessLetter] = Response.SURELY_NOT;
+                    // check if for every other pos with same letter, that letter is not maybe
                     let all_ok = true;
                     for (let q = 0; q < NPOS; ++q) {
-                        all_ok &= (guess[q] != currGuessLetter || response[q] !== 1);
+                        // TYPE COERCION below, response is a string, NaN
+                        all_ok &= (guess[q] != currGuessLetter || response[q] != 1);
                         if (!all_ok) break;
                     }
                     if (all_ok) {
@@ -303,7 +308,11 @@
         if (strategy === 0 || strategy === 2) {
             for (let p = 0; p < NPOS; ++p) {
                 if (knowledge[p][WORDS[wid][p]] === -1) {
-                    return "Uses invalid character '" + String.fromCharCode(97 + WORDS[wid][p]) + "' at position " + p + " (combined or conservative)";
+                    let error = "Uses invalid character '" + String.fromCharCode(97 + WORDS[wid][p]) + "' at position " + p + " (combined or conservative)";
+                    if ($debugModeStore) {
+                        console.error(error);
+                    }
+                    return error;
                 }
             }
         }
@@ -318,7 +327,11 @@
                     new_knowledge = true;
             }
             if (!(new_knowledge || correct)) {
-                return "The word contains no new information (combined or permissive)";
+                let error = "The word contains no new information (combined or permissive)";
+                if ($debugModeStore) {
+                    console.error(error);
+                }
+                return error;
             }
         }
         return null;
@@ -445,6 +458,7 @@
 
     function showWords() {
         let best = bestAction();
+        let prev_proposals = $proposalsStore;
         let proposals = [];
         const correctLetters = sureLetters.reduce(function (acc, curr) {
             return acc[curr] ? ++acc[curr] : acc[curr] = 1, acc
@@ -464,6 +478,7 @@
         }
 
         for (let wid = 0; wid < NWORDS; ++wid) {
+            // knowledge: 0 = green, 1 = yellow, 2 = grey, 3 = white
             let word = {wid: wid, word: "", knowledge: [3, 3, 3, 3, 3], cost: Infinity};
 
             // reset duplicate hints
@@ -473,6 +488,7 @@
             if (responseHistoryWids.includes(wid)) {
                 continue;
             }
+
             if (consistent(wid) === null && (mode === 0 || hard[wid])) {
                 // for NPOS; for NLETTER, if knowledge[p][l] is 1, then correct and put knowledge 0 to word
 
@@ -496,27 +512,30 @@
                     word["word"] += String.fromCharCode(97 + char);
                 }
 
-                // if best action is not infinity, then we are in strategy mode??
-                // Perhaps we have knowledge and are now able to query strategy to make a decision
-                if (best !== Infinity) {
-                    let cst = strategyLookup(wid);
-                    if (cst === undefined) {
-                        continue;
-                    }
-                    word['cost'] = cst;
+                word['cost'] = strategyLookup(wid);
+
+                proposals.push(word);
+            } else {
+                // word is not consistent, convert word to string
+                let wordString = "";
+                for (let i = 0; i < NPOS; i++) {
+                    wordString += String.fromCharCode(97 + WORDS[wid][i]);
                 }
             }
-            proposals.push(word);
         }
 
-        proposalsStore.set(proposals.sort((a, b) => {
+        proposals.sort((a, b) => {
             return a.cost - b.cost;
-        }));
+        });
+
+        console.log("number of proposals: " + proposals.length + " best action: " + best)
+
+        proposalsStore.set(proposals);
     }
 
     function displayKnowledge() {
         // fixme: port to svelte component if requirement arises
-        let knhtml = "<table class='knowledge'>";
+        let knhtml = "<table class='knowledgeTable'>";
         for (let p = 0; p < NPOS; ++p) {
             if (p === 0) {
                 knhtml += "<tr>";
@@ -529,9 +548,9 @@
                 knhtml += "<td>";
                 const k = knowledge[p][l];
                 if (k == Response.SURELY_NOT) {
-                    knhtml += "<i>";
+                    knhtml += "<i style='color: red'>";
                 } else if (k == Response.SURELY) {
-                    knhtml += "<b>";
+                    knhtml += "<b style='color: green'>";
                 }
                 knhtml += String.fromCharCode(97 + l);
                 if (k == Response.SURELY_NOT) {
@@ -545,6 +564,7 @@
         }
         knhtml += "</table>";
         knowledge_html = knhtml;
+        knowledgeHtmlStore.set(knowledge_html);
     }
 
 

@@ -19,8 +19,10 @@ export const lossTrigger = writable(false);
 export const gameInProgress = writable(false);
 export const newGameTrigger = writable(false);
 export const guessSubmitTrigger = writable(false);
+export const debugModeStore = writable(false); //FIXME set to false when release
 
 export const knowledgeStore = writable(new Array(NPOS));
+export const knowledgeHtmlStore = writable();
 
 export const sureLettersStore = writable(new Array(NPOS).fill(-1));
 

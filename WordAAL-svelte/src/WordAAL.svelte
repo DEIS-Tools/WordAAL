@@ -21,7 +21,15 @@
     import Keyboard from "svelte-keyboard"
     import Key from './components/Key.svelte'
     import StrategyDriver from "./components/StrategyDriver.svelte";
-    import {guessStore, guessSubmitTrigger, knowledgeStore, targetWordStore, globalCountsStore} from "./stores/stores"
+    import {
+        guessStore,
+        guessSubmitTrigger,
+        knowledgeStore,
+        targetWordStore,
+        globalCountsStore,
+        knowledgeHtmlStore,
+        debugModeStore
+    } from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
     import {CollapsiblePanel} from "@watergis/svelte-collapsible-panel";
@@ -120,6 +128,11 @@
 
     }
 
+    let knowledgeHTML = null;
+    knowledgeHtmlStore.subscribe((value) => {
+        knowledgeHTML = value;
+    });
+
 </script>
 
 <main>
@@ -144,6 +157,14 @@
         </div>
         <StrategyDriver/>
     </div>
+    <br>
+    <center>
+        {#if $debugModeStore}
+            <div>
+                {@html knowledgeHTML}
+            </div>
+        {/if}
+    </center>
 
     <Keyboard layout="wordle" --background="#dce1ed" --active-background="#6F7685" --text-transform="capitalize"
               --active-transform="bold" on:keydown={onWordleKeyDown}/>

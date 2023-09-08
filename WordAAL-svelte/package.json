@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "devDependencies": {
     "@material/elevation": "^14.0.0",
@@ -20,11 +21,13 @@
     "@smui/ripple": "^7.0.0-beta.0",
     "@smui/tooltip": "^7.0.0-beta.3",
     "@sveltejs/vite-plugin-svelte": "^2.0.2",
+    "jsdom": "^22.1.0",
     "simple-svelte-autocomplete": "^2.5.2",
     "smui-theme": "^7.0.0-beta.3",
     "svelte": "^3.55.1",
     "svelte-drawer-component": "^1.2.2",
-    "vite": "^4.1.0"
+    "vite": "^4.1.0",
+    "vitest": "^0.34.3"
   },
   "dependencies": {
     "@fireworks-js/svelte": "^2.10.2",
@@ -32,6 +35,7 @@
     "@smui/snackbar": "^7.0.0-beta.0",
     "@watergis/svelte-collapsible-panel": "^0.0.15",
     "svelte-keyboard": "^0.5.5",
-    "svelte-material-ui": "^7.0.0-beta.3"
+    "svelte-material-ui": "^7.0.0-beta.3",
+    "ts-pattern": "^5.0.5"
   }
 }

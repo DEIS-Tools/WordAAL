@@ -12,6 +12,7 @@
     import Button from "@smui/button";
     import Textfield from "@smui/textfield";
     import AutoComplete from "simple-svelte-autocomplete"
+    import { debugModeStore } from "../stores/stores.js";
 
     onMount(() => {
         randomTargetWord();
@@ -31,13 +32,12 @@
         }
         target = target.join('');
         let chars = WORDS[index];
-        /*
-                //fixme: DEBUG hardcoding target for testing
-                target = "enjoy"; //hardcode target word
-                chars = convertStringToCharArray(target)
-                index = WORDS_STRINGIFIED.indexOf(target);
-                console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
-        */
+        if ($debugModeStore) {
+            target = "anode"; //hardcode target word for debugging
+            chars = convertStringToCharArray(target)
+            index = WORDS_STRINGIFIED.indexOf(target);
+            console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");
+        }
         targetWordStore.set({cleartext: target, index: index, chars: chars});
     }
 
