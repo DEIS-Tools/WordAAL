@@ -33,7 +33,7 @@
         target = target.join('');
         let chars = WORDS[index];
         if ($debugModeStore) {
-            target = "anode"; //hardcode target word for debugging
+            target = "cedar"; //hardcode target word for debugging
             chars = convertStringToCharArray(target)
             index = WORDS_STRINGIFIED.indexOf(target);
             console.warn("wordpicker: DEBUG set target to " + target + " (index " + index + ")" + " (chars " + chars + ")");

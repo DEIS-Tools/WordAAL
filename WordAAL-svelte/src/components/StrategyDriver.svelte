@@ -6,6 +6,7 @@
         NWORDS,
         WORDS,
         convertStringToCharArray,
+        knowledgeScore,
     } from "../lib/Consts.svelte";
     import {
         proposalsStore,
@@ -563,6 +564,7 @@
             knhtml += "</tr>";
         }
         knhtml += "</table>";
+        knhtml += "<p> score " + knowledgeScore(knowledge) + "/" + 26 * NPOS + "</p>"
         knowledge_html = knhtml;
         knowledgeHtmlStore.set(knowledge_html);
     }

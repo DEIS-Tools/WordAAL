@@ -7,6 +7,23 @@
     export const NUM_PROPOSALS = 5;
     export const INDEX_LAST_CURATED_WORD = 2314;
 
+    export function knowledgeScore(knowledgeMatrix) {
+        let score = 0;
+        for (let p = 0; p < NPOS; p++) {
+            for (let l = 0; l < NLETTER; l++) {
+                if (p === 0) {
+                    // reading counts for each letter
+                } else {
+                    // add 1 to score for each incorrectly placed letter
+                    if (knowledgeMatrix[p][l] === -1) {
+                        score += 1;
+                    }
+                }
+            }
+        }
+        return score;
+    }
+
     export function convertStringToCharArray(str) {
         const res = new Array(str.length);
         for (let i = 0; i < str.length; i++) {
