@@ -3,13 +3,14 @@
     import {Actions, Content} from "@smui/dialog";
     import Button from "@smui/button";
     import {Label} from "@smui/snackbar";
+    import {setCookieItem} from "../lib/Consts.svelte";
 
     export let text: string = "InfoCard content";
     export let show: boolean = true;
 
     let close = () => {
         show = false;
-        document.cookie = "wordaalWelcomeCardShow=0; SameSite=Lax; expires=Thu, 01 Jan 9999 00:00:00 UTC; path=/";
+        setCookieItem("wordaalWelcomeCardShow", "0");
     }
 
 </script>

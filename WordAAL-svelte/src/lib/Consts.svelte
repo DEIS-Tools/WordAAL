@@ -7,6 +7,11 @@
     export const NUM_PROPOSALS = 5;
     export const INDEX_LAST_CURATED_WORD = 2314;
 
+
+    export function setCookieItem(name, value) {
+        document.cookie = `${name}=${value}`;
+    }
+
     export function convertStringToCharArray(str) {
         const res = new Array(str.length);
         for (let i = 0; i < str.length; i++) {

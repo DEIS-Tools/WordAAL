@@ -5,6 +5,8 @@
     import Switch from '@smui/switch';
     import FormField from '@smui/form-field';
     import Tooltip, { Wrapper } from '@smui/tooltip';
+    import {setCookieItem} from "../lib/Consts.svelte";
+
 
 
     let availableStrats = [
@@ -43,6 +45,9 @@
         } else {
             console.error("strategy index not found")
         }
+
+        setCookieItem("wordaalStrategy", strategy.name);
+        setCookieItem("wordaalHard", hard);
     }
 
 

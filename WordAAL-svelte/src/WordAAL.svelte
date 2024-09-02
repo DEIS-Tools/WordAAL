@@ -28,7 +28,7 @@
         targetWordStore,
         globalCountsStore,
         knowledgeHtmlStore,
-        debugModeStore
+        debugModeStore, strategyStore
     } from "./stores/stores"
     import ProposalChooser from "./components/ProposalChooser.svelte";
     import Game from "./components/Game.svelte";
