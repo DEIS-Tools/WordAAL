@@ -235,12 +235,3 @@
         </Button>
     </Actions>
 </Dialog>
-<style lang="scss">
-  .box {
-    display: flex;
-    flex-direction: row;
-    float: inside;
-    padding: 5px;
-    margin: 5px;
-  }
-</style>

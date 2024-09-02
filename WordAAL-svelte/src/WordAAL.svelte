@@ -169,11 +169,13 @@
     <Keyboard layout="wordle" --background="#dce1ed" --active-background="#6F7685" --text-transform="capitalize"
               --active-transform="bold" on:keydown={onWordleKeyDown}/>
 
-    <CollapsiblePanel title={'Game options'} color={'black'} bind:isPanelOpen={gameOptionsOpen}>
-        <Card padded>
-            <SettingsChooser/>
-        </Card>
-    </CollapsiblePanel>
+    <div class="header-menu">
+        <CollapsiblePanel --font-size="1em" title='Game options' color="is-info" bind:isPanelOpen={gameOptionsOpen}>
+            <Card padded>
+                <SettingsChooser/>
+            </Card>
+        </CollapsiblePanel>
+    </div>
 
     <InfoCard show={!hideWelcomeInfo} text="<b>Welcome to WordAAL alpha</b>: A Wordle game enhanced with UPPAAL Stratego assistance.<br/>
     Explore how different strategies prioritise guesses on any target word in the Wordle word-list.<br/>
@@ -230,6 +232,19 @@
   .header {
     text-align: center;
     margin-bottom: 10px;
+  }
+
+  .header-menu {
+    margin-top: 5px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #ededed;
+  }
+
+  :global(.panel-heading) {
+    font-weight: bold;
+    font-size: 1.2em;
+    padding-bottom: 5px;
   }
 
   #firework {
