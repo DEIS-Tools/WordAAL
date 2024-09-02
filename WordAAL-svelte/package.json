@@ -24,7 +24,7 @@
     "jsdom": "^22.1.0",
     "simple-svelte-autocomplete": "^2.5.2",
     "smui-theme": "^7.0.0-beta.3",
-    "svelte": "^3.55.1",
+    "svelte": "^4.2.19",
     "svelte-drawer-component": "^1.2.2",
     "vite": "^4.5.2",
     "vitest": "^0.34.3"
@@ -33,7 +33,7 @@
     "@fireworks-js/svelte": "^2.10.2",
     "@material/theme": "^14.0.0",
     "@smui/snackbar": "^7.0.0-beta.0",
-    "@watergis/svelte-collapsible-panel": "^0.0.15",
+    "@watergis/svelte-collapsible-panel": "^3.0.1",
     "svelte-keyboard": "^0.5.5",
     "svelte-material-ui": "^7.0.0-beta.3",
     "ts-pattern": "^5.0.5"
